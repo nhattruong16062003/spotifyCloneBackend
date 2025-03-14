@@ -1,6 +1,7 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
-class UserManager(models.Manager):
+class UserManager(BaseUserManager):
     def normalize_email(self, email):
         """
         Normalize the email address by lowercasing the domain part of it.
@@ -13,6 +14,7 @@ class UserManager(models.Manager):
         else:
             email = email_name + '@' + domain_part.lower()
         return email
+
     def create_user(self, email, username, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
@@ -33,13 +35,13 @@ class UserManager(models.Manager):
 
         return self.create_user(email, username, password, **extra_fields)
 
-class User(models.Model):
+class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
     google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     role = models.CharField(max_length=10, choices=[('free', 'Free'), ('premium', 'Premium')], default='free')
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = UserManager()
