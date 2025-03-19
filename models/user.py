@@ -3,9 +3,6 @@ from django.db import models
 
 class UserManager(BaseUserManager):
     def normalize_email(self, email):
-        """
-        Normalize the email address by lowercasing the domain part of it.
-        """
         email = email or ''
         try:
             email_name, domain_part = email.strip().rsplit('@', 1)
