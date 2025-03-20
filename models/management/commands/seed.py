@@ -14,7 +14,7 @@ class Command(BaseCommand):
                 username=fake.user_name(),
                 email=fake.email(),
                 google_id=fake.uuid4(),
-                role=fake.random_element(elements=('free', 'premium')),
+                role=fake.random_element(elements=('artist', 'user')),
                 is_active=fake.random_element(elements=(True, False)),
                 created_at=fake.date_time_this_year()
             )
