@@ -8,7 +8,7 @@ class CheckAccessTokenMiddleware:
 
     def __call__(self, request):
         # Bỏ qua các URL không yêu cầu xác thực
-        if request.path.startswith('/admin/') or request.path.startswith('/api/auth/'):
+        if request.path.startswith('/api/auth/'):
             return self.get_response(request)
 
         jwt_auth = JWTAuthentication()

@@ -1,2 +1,3 @@
-##Lisence
-MIT Lisence
+## License
+
+MIT
