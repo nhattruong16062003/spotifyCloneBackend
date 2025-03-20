@@ -1,6 +1,8 @@
 from pathlib import Path 
 import os
 import pymysql
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,7 +13,7 @@ SECRET_KEY = 'django-insecure-(8rp7n8*zmy88f)yjl$!al$2#td-%vm*cuvka9zh1gcg+o*f@b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = 'models.User'  # Đăng ký custom User model
 # Application definition
@@ -26,6 +28,8 @@ INSTALLED_APPS = [
     
     # Django REST Framework
     'rest_framework',
+    'rest_framework.authtoken', 
+    'rest_framework_simplejwt',
     
     # Your apps
     'api',
@@ -33,7 +37,22 @@ INSTALLED_APPS = [
     'cores',
     'payments',
     'services',
+
+    # Allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    
+
+    # Corsheaders
+    'corsheaders',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -43,7 +62,21 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Allauth
+    'allauth.account.middleware.AccountMiddleware',
+
+    # Corsheaders
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+
+    # Custom middleware
+    'middleware.auth_middleware.CheckAccessTokenMiddleware',
 ]
+
+
+WSGI_APPLICATION = 'spotifyCloneBackend.wsgi.application'
+
 
 ROOT_URLCONF = 'spotifyCloneBackend.urls'
 
@@ -62,9 +95,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'spotifyCloneBackend.wsgi.application'
-
 
 DATABASES = {
     'default': {
@@ -109,3 +139,70 @@ STATIC_URL = 'static/'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# Email settings (for sending activation email)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'phamvanloi77tphcm@gmail.com'
+EMAIL_HOST_PASSWORD = 'enpd vmwo pcbf wurb'
+
+
+# Allauth settings
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+
+# Google OAuth Settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+
+# Corsheaders settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    # Thêm các nguồn gốc khác nếu cần
+]
+
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+
+# Simple JWT settings
+# SIMPLE_JWT = {
+#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+#     'BLACKLIST_AFTER_ROTATION': True,
+# }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
+
+
+
