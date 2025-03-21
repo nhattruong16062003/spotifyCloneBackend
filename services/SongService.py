@@ -7,6 +7,13 @@ class SongService:
         return song
 
     @staticmethod
+    def get_song(song_id):
+        try:
+            return Song.objects.get(id=song_id)
+        except Song.DoesNotExist:
+            return None
+
+    @staticmethod
     def update_song(song_id, data):
         try:
             song = Song.objects.get(id=song_id)

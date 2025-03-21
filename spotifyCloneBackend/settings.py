@@ -6,15 +6,24 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Load biến môi trường từ file .env
 
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
-AWS_S3_REGION_NAME = os.getenv("AWS_REGION")
+MP3_AWS_ACCESS_KEY_ID = os.getenv("MP3_AWS_ACCESS_KEY_ID")
+MP3_AWS_SECRET_ACCESS_KEY = os.getenv("MP3_AWS_SECRET_ACCESS_KEY")
+MP3_AWS_STORAGE_BUCKET_NAME = os.getenv("MP3_AWS_STORAGE_BUCKET_NAME")
+MP3_AWS_S3_REGION_NAME = os.getenv("MP3_AWS_S3_REGION_NAME")
 
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-AWS_S3_FILE_OVERWRITE = False  # Không ghi đè file trùng tên
-AWS_QUERYSTRING_AUTH = False  # Loại bỏ token khỏi URL file
-AWS_S3_CUSTOM_DOMAIN = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+MP3_AWS_S3_FILE_OVERWRITE = False  # Không ghi đè file trùng tên
+MP3_AWS_QUERYSTRING_AUTH = False  # Loại bỏ token khỏi URL file
+MP3_AWS_S3_CUSTOM_DOMAIN = f"https://{MP3_AWS_STORAGE_BUCKET_NAME}.s3.{MP3_AWS_S3_REGION_NAME}.amazonaws.com"
+
+IMG_AWS_ACCESS_KEY_ID = os.getenv("IMG_AWS_ACCESS_KEY_ID")
+IMG_AWS_SECRET_ACCESS_KEY = os.getenv("IMG_AWS_SECRET_ACCESS_KEY")
+IMG_AWS_STORAGE_BUCKET_NAME = os.getenv("IMG_AWS_STORAGE_BUCKET_NAME")
+IMG_AWS_S3_REGION_NAME = os.getenv("IMG_AWS_S3_REGION_NAME")
+
+IMG_AWS_S3_FILE_OVERWRITE = False  # Không ghi đè file trùng tên
+IMG_AWS_QUERYSTRING_AUTH = False  # Loại bỏ token khỏi URL file
+IMG_AWS_S3_CUSTOM_DOMAIN = f"https://{IMG_AWS_STORAGE_BUCKET_NAME}.s3.{IMG_AWS_S3_REGION_NAME}.amazonaws.com"
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -81,11 +90,9 @@ MIDDLEWARE = [
 
     # Corsheaders
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 
     # Custom middleware
     # 'middleware.auth_middleware.CheckAccessTokenMiddleware',
-    'middleware.auth_middleware.CustomAuthMiddleware',
 ]
 
 
@@ -200,14 +207,14 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # REST Framework settings
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',  # Tự động kiểm tra JWT
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES': (
-#        'rest_framework.permissions.AllowAny',  # Cho phép tất cả API không cần đăng nhập
-#     ),
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Tự động kiểm tra JWT
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #    'rest_framework.permissions.IsAuthenticated',  # Cho phép tất cả API không cần đăng nhập
+    # ),
+}
 
 
 
