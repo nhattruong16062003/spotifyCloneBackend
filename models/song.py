@@ -7,7 +7,8 @@ class Song(models.Model):
     album = models.CharField(max_length=255, null=True, blank=True)
     genre = models.CharField(max_length=100, null=True, blank=True)
     duration = models.PositiveIntegerField()  # Duration in seconds
-    file_path = models.CharField(max_length=255)
+    mp3_path = models.CharField(max_length=255)  # Renamed from file_path
+    image_path = models.CharField(max_length=255, null=True, blank=True)  # New field for image path
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
