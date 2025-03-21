@@ -11,6 +11,7 @@ class CheckAccessTokenMiddleware:
         # Bỏ qua các URL không yêu cầu xác thực
         if request.path.startswith('/admin/') or request.path.startswith('/api/auth/'):
             return self.get_response(request)  # Bỏ qua kiểm tra token
+
         jwt_auth = JWTAuthentication()
         try:
             print(f"Before authentication: {request.user}")  # Có thể là AnonymousUser
