@@ -90,9 +90,6 @@ MIDDLEWARE = [
 
     # Corsheaders
     'corsheaders.middleware.CorsMiddleware',
-
-    # Custom middleware
-    # 'middleware.auth_middleware.CheckAccessTokenMiddleware',
 ]
 
 
@@ -206,14 +203,12 @@ CORS_ALLOWED_ORIGINS = [
     # Thêm các nguồn gốc khác nếu cần
 ]
 
+
 # REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # Tự động kiểm tra JWT
     ),
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #    'rest_framework.permissions.IsAuthenticated',  # Cho phép tất cả API không cần đăng nhập
-    # ),
 }
 
 
