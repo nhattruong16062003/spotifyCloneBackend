@@ -72,7 +72,8 @@ class AuthView(APIView):
         return Response(tokens, status=status.HTTP_200_OK)
 
     def refresh_token(self, request):
-        refresh_token = request.data.get("refresh")
+        refresh_token = request.data.get("refresh")  
+        print(f"Before authentication: {refresh_token}")
         if not refresh_token:
             return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
 

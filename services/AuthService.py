@@ -46,12 +46,41 @@ class AuthService:
             'access': str(refresh.access_token),
         }
 
+    # @staticmethod
+    # def refresh_tokens(refresh_token):
+    #     try:
+    #         token = RefreshToken(refresh_token)
+    #         print(f"Before authentication: {token.user}") 
+    #         access_token = str(token.access_token)
+    #         new_refresh_token = str(RefreshToken.for_user(token.user))
+    #         print(f"Before authentication: {access_token}")  # Có thể là AnonymousUser
+    #         return {"access": access_token, "refresh": new_refresh_token}, None
+    #     except TokenError:
+    #         return None, "INVALID_REFRESH_TOKEN"
     @staticmethod
     def refresh_tokens(refresh_token):
         try:
+            # Giải mã refresh token
             token = RefreshToken(refresh_token)
+
+            # Lấy user_id từ token
+            user_id = token.get("user_id")
+            if not user_id:
+                return None, "INVALID_REFRESH_TOKEN"
+
+            # Lấy user từ database
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return None, "USER_NOT_FOUND"
+
+            print(f"Before authentication: {user}") 
+            # Tạo access token mới
             access_token = str(token.access_token)
-            new_refresh_token = str(RefreshToken.for_user(token.user))
+
+            # Tạo refresh token mới
+            new_refresh_token = str(RefreshToken.for_user(user))
+
             return {"access": access_token, "refresh": new_refresh_token}, None
         except TokenError:
             return None, "INVALID_REFRESH_TOKEN"
