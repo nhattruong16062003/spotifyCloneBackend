@@ -90,10 +90,9 @@ MIDDLEWARE = [
 
     # Corsheaders
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 
     # Custom middleware
-    'middleware.auth_middleware.CheckAccessTokenMiddleware',
+    # 'middleware.auth_middleware.CheckAccessTokenMiddleware',
 ]
 
 
@@ -208,11 +207,15 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # REST Framework settings
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     ),
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Tự động kiểm tra JWT
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #    'rest_framework.permissions.IsAuthenticated',  # Cho phép tất cả API không cần đăng nhập
+    # ),
+}
+
 
 
 # Simple JWT settings

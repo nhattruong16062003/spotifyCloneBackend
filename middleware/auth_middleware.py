@@ -25,3 +25,4 @@ class CheckAccessTokenMiddleware:
         except (InvalidToken, TokenError):
             return JsonResponse({'detail': 'Invalid or expired token'}, status=401)
         return self.get_response(request)
+

@@ -7,6 +7,7 @@ from services.ImageService import ImageService
 
 class SongView(APIView):
     def post(self, request, *args, **kwargs):
+        print(f"After authentication2: Oke")
         if "file" not in request.FILES:
             return Response({"error": "No file uploaded"}, status=400)
 
