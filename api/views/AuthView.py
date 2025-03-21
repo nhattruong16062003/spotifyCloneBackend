@@ -19,12 +19,14 @@ import google.oauth2.id_token
 from django.http import HttpResponseRedirect
 import requests
 from services.AuthService import AuthService
+from rest_framework.permissions import AllowAny
 
 
 
 User = get_user_model()
 
 class AuthView(APIView):
+    # permission_classes = [AllowAny]  # Không yêu cầu xác thực
     def post(self, request, action):
         if action == 'register':
             return self.register(request)
