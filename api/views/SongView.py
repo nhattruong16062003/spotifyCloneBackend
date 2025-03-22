@@ -34,7 +34,7 @@ class SongView(APIView):
             "duration": request.data.get("duration"),
             "album": request.data.get("album"),
             "genre": request.data.get("genre"),
-            "artist_id": request.data.get("artist_id"), 
+            "user_id": request.data.get("user_id"), 
             "mp3_path": file_url,
             "image_path": image_url
         }

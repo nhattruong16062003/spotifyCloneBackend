@@ -1,6 +1,10 @@
 from django.core.management.base import BaseCommand
 from faker import Faker
-from models.models import User, Artist, Song, Subscription, Transaction, Playlist, PlaylistSong, PlaybackHistory
+from models.models import User, Song, Subscription, Transaction, Playlist, PlaylistSong, PlaybackHistory,SongPlayHistory
+import random
+from django.utils.timezone import now
+from datetime import timedelta
+
 
 class Command(BaseCommand):
     help = 'Seed database with fake data'
@@ -21,23 +25,16 @@ class Command(BaseCommand):
             user.set_password('password123')  # Hash the password
             user.save()
 
-        # Create fake artists
-        for _ in range(5):
-            artist = Artist.objects.create(
-                name=fake.name(),
-                bio=fake.text()
-            )
-            artist.save()
-
         # Create fake songs
         for _ in range(20):
             song = Song.objects.create(
                 title=fake.sentence(nb_words=3),
-                artist=Artist.objects.order_by('?').first(),
+                user=User.objects.order_by('?').first(),
                 album=fake.word(),
                 genre=fake.word(),
                 duration=fake.random_int(min=180, max=300),  # Duration in seconds
-                file_path=fake.file_path(),
+                mp3_path=fake.file_path(),
+                image_path=fake.file_path(),
                 uploaded_at=fake.date_time_this_year()
             )
             song.save()
@@ -93,5 +90,18 @@ class Command(BaseCommand):
                     played_at=fake.date_time_this_year()
                 )
                 playback_history.save()
+
+         # Create fake SongPlayHistory
+        for user in User.objects.all():
+            for _ in range(random.randint(5, 15)):  # Tạo từ 5-15 lượt nghe/người
+                song = Song.objects.order_by('?').first()
+                played_at = now() - timedelta(days=random.randint(0, 30))  # Chọn ngày ngẫu nhiên trong tháng
+
+                song_play_history = SongPlayHistory.objects.create(
+                    user=user,
+                    song=song,
+                    played_at=played_at
+                )
+                song_play_history.save()
 
         self.stdout.write(self.style.SUCCESS('Successfully seeded the database'))
