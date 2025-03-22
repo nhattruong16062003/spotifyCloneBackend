@@ -62,7 +62,7 @@ class SongView(APIView):
         return Response({
             "id": song.id,
             "title": song.title,
-            "artist": song.artist.name,
+            "artist": song.user.username,
             "album": song.album,
             "genre": song.genre,
             "duration": song.duration,
