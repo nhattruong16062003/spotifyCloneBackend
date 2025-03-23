@@ -28,7 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
-    role = models.CharField(max_length=10, default='User')
+    role = models.CharField(max_length=10, default='user')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     premium_start = models.DateTimeField(null=True, blank=True)
