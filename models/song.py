@@ -4,7 +4,7 @@ from .user import User
 class Song(models.Model):
     title = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    album = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)  
     genre = models.CharField(max_length=100, null=True, blank=True)
     duration = models.PositiveIntegerField()  # Duration in seconds
     mp3_path = models.CharField(max_length=255)  # Renamed from file_path
