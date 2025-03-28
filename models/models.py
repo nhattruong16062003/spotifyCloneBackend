@@ -7,3 +7,4 @@ from .subscription import Subscription
 from .transaction import Transaction
 from .user import User
 from .song_play_history import SongPlayHistory
+from .role import Role

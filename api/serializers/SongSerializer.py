@@ -11,7 +11,7 @@ class SongSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'user',  # Sử dụng trường tùy chỉnh đã định nghĩa ở trên
-            'album',
+            'description',
             'genre',
             'duration',
             'mp3_path',

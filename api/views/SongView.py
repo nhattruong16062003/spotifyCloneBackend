@@ -32,7 +32,7 @@ class SongView(APIView):
         data = {
             "title": request.data.get("title"),
             "duration": request.data.get("duration"),
-            "album": request.data.get("album"),
+            "description": request.data.get("description"),
             "genre": request.data.get("genre"),
             "user_id": request.data.get("user_id"), 
             "mp3_path": file_url,
@@ -99,7 +99,7 @@ class SongView(APIView):
             "id": song.id,
             "title": song.title,
             "artist": song.user.username,
-            "album": song.album,
+            "description": song.description,
             "genre": song.genre,
             "duration": song.duration,
             "mp3_path": song.mp3_path,
