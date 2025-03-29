@@ -15,9 +15,9 @@ urlpatterns = [
     path('api/song/', SongView.as_view(), name='add_song'),
     path('api/song/<int:song_id>/', SongView.as_view(), name='update_delete_song'),
 
-    path('api/trending/song/', TrendingView.as_view(), name='trending_songs'),
+    path('api/trending/songs/', TrendingView.as_view(), name='trending_songs'),
     path('api/trending/playlists/', TrendingView.as_view(), name='trending_playlists'),
-    path('api/trending/album/', TrendingView.as_view(), name='trending_albums'),
+    path('api/trending/albums/', TrendingView.as_view(), name='trending_albums'),
 
     path('api/song/previous/<int:song_id>/<int:user_id>/', SongView.as_view(), name='previous_song'),
     path('api/song/next/<int:song_id>/<int:user_id>/', SongView.as_view(), name='next_song'),
