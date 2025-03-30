@@ -71,8 +71,10 @@ class AuthView(APIView):
 
         login(request, user)
         tokens = AuthService.generate_tokens(user)
-        return Response(tokens, status=status.HTTP_200_OK)
-
+        # Lấy thông tin user
+        user_data = UserSerializer(user).data  # Dùng serializer để định dạng user info
+        return Response({"tokens": tokens,"user": user_data}, status=status.HTTP_200_OK)
+        
     def refresh_token(self, request):
         refresh_token = request.data.get("refresh")  
         print(f"Before authentication: {refresh_token}")

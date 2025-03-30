@@ -5,6 +5,7 @@ from .views.UserView import UserView
 from .views.SongView import SongView
 from .views.TrendingView import TrendingView
 from .views.SongPlayHistoryView import SongPlayHistoryView  
+from .views.AccountView import AccountView
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -23,6 +24,7 @@ urlpatterns = [
     path('api/song/next/<int:song_id>/<int:user_id>/', SongView.as_view(), name='next_song'),
 
     path('api/history/update/', SongPlayHistoryView.as_view(), name='update_play_history'),
+    path('api/account/', AccountView.as_view(), name='account'),
 
 ]
 

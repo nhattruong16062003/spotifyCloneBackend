@@ -4,7 +4,8 @@ from models.user import User  # Correct the import path
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password','image_path']
+        # fields = '__all__'
         extra_kwargs = {
             'password': {'write_only': True}
         }
