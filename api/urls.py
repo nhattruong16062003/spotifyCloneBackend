@@ -4,7 +4,9 @@ from .views.HomeView import HomeView
 from .views.UserView import UserView
 from .views.SongView import SongView
 from .views.TrendingView import TrendingView
-from .views.SongPlayHistoryView import SongPlayHistoryView  
+from .views.SongPlayHistoryView import SongPlayHistoryView
+from .views.PlaylistView import PlaylistView
+
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -19,10 +21,15 @@ urlpatterns = [
     path('api/trending/playlists/', TrendingView.as_view(), name='trending_playlists'),
     path('api/trending/albums/', TrendingView.as_view(), name='trending_albums'),
 
-    path('api/song/previous/<int:song_id>/<int:user_id>/', SongView.as_view(), name='previous_song'),
+    path('api/song/previous/<int:song_id>/', SongView.as_view(), name='previous_song'),
     path('api/song/next/<int:song_id>/', SongView.as_view(), name='next_song'),
 
     path('api/history/update/', SongPlayHistoryView.as_view(), name='update_play_history'),
+
+    path('api/playlist/user/<int:song_id>/', PlaylistView.as_view(), name='get_playlists_from_user'),
+    path('api/playlist/add-song/', PlaylistView.as_view(), name='add_song_to_playlist'),
+    path('api/playlist/create/', PlaylistView.as_view(), name='create_playlist'), 
+
 
 ]
 
