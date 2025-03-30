@@ -20,7 +20,7 @@ urlpatterns = [
     path('api/trending/albums/', TrendingView.as_view(), name='trending_albums'),
 
     path('api/song/previous/<int:song_id>/<int:user_id>/', SongView.as_view(), name='previous_song'),
-    path('api/song/next/<int:song_id>/<int:user_id>/', SongView.as_view(), name='next_song'),
+    path('api/song/next/<int:song_id>/', SongView.as_view(), name='next_song'),
 
     path('api/history/update/', SongPlayHistoryView.as_view(), name='update_play_history'),
 
