@@ -34,18 +34,21 @@ class TrendingService:
             return []
         
     @staticmethod
-    def get_trending_playlists(limit=10):
+    def get_trending_playlists(limit):
         # Lấy ngày hiện tại và trừ đi 30 ngày
         thirty_days_ago = timezone.now() - timedelta(days=30)
         
         try:
             # Lấy danh sách các playlist và tổng số lượt nghe của các bài hát trong playlist trong 30 ngày gần nhất
+            # chỉ tính lượt nghe từ playlist có user có role_id = 3 (user)
             trending_playlists = Playlist.objects.annotate(
                 total_plays=Count(
                     'playlistsong__song__play_history',
                     filter=models.Q(playlistsong__song__play_history__played_at__gte=thirty_days_ago)
                 )
-            ).order_by('-total_plays')[:limit]
+            ).filter(user__role_id=3) 
+            
+            trending_playlists=trending_playlists.order_by('-total_plays')[:limit]
             
             # Serialize dữ liệu và trả về
             return PlaylistSerializer(trending_playlists, many=True).data
@@ -53,31 +56,25 @@ class TrendingService:
             print(f"Error fetching trending playlists: {e}")
             return []
 
-    # @staticmethod
-    # def get_trending_playlists(limit=3):
-    #     # Lấy danh sách playlist hot nhất dựa trên play_count
-    #     try:
-    #         playlists = Playlist.objects.order_by('-play_count')[:limit]
-    #         return PlaylistSerializer(playlists, many=True).data
-    #     except Exception as e:
-    #         print(f"Error fetching trending playlists: {e}")
-    #         return []
 
-    # @staticmethod
-    # def get_trending_albums(limit=3):
-    #     # Lấy danh sách album hot nhất dựa trên play_count
-    #     try:
-    #         albums = Album.objects.order_by('-play_count')[:limit]
-    #         return AlbumSerializer(albums, many=True).data
-    #     except Exception as e:
-    #         print(f"Error fetching trending albums: {e}")
-    #         return []
+    def get_trending_albums(limit):
+        thirty_days_ago = timezone.now() - timedelta(days=30)
 
-    # @staticmethod
-    # def get_all_trending(limit=3):
-    #     # Gộp tất cả dữ liệu trending vào một dict
-    #     return {
-    #         'trending_songs': TrendingService.get_trending_songs(limit=10),  # Limit cho songs là 10
-    #         'trending_playlists': TrendingService.get_trending_playlists(limit),
-    #         'trending_albums': TrendingService.get_trending_albums(limit),
-    #     }
+        try:
+            # Lấy danh sách album có tổng số lượt nghe cao nhất trong 30 ngày gần nhất,
+            # chỉ tính lượt nghe từ playlist có user có role_id = 2 (artist)
+            trending_albums = Playlist.objects.annotate(
+                total_plays=Count(
+                    'playlistsong__song__play_history',
+                    filter=models.Q(playlistsong__song__play_history__played_at__gte=thirty_days_ago)
+                )
+            ).filter(user__role_id=2) 
+
+            # Giới hạn số lượng kết quả trả về
+            trending_albums = trending_albums.order_by('-total_plays')[:limit]
+
+            # Serialize dữ liệu và trả về
+            return PlaylistSerializer(trending_albums, many=True).data
+        except Exception as e:
+            print(f"Error fetching trending albums: {e}")
+            return []

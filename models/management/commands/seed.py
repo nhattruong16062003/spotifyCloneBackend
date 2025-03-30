@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from faker import Faker
-from models.models import User, Song, Subscription, Transaction, Playlist, PlaylistSong, PlaybackHistory,SongPlayHistory
+from models.models import User, Song, Subscription, Transaction, Playlist, PlaylistSong, PlaybackHistory,SongPlayHistory,Role
 import random
 from django.utils.timezone import now
 from datetime import timedelta
@@ -12,13 +12,24 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         fake = Faker()
 
+        # Create fake roles
+        roles = [
+            Role(id=1, name="admin"),
+            Role(id=2, name="artist"),
+            Role(id=3, name="user")
+        ]
+
+        for role in roles:
+            if not Role.objects.filter(id=role.id).exists():  # Kiểm tra xem role đã tồn tại chưa
+                role.save()
+
         # Create fake users
         for _ in range(10):
             user = User(
                 username=fake.user_name(),
                 email=fake.email(),
                 google_id=fake.uuid4(),
-                role=fake.random_element(elements=('artist', 'user')),
+                role_id=fake.random_element(elements=[2, 3]),
                 is_active=fake.random_element(elements=(True, False)),
                 created_at=fake.date_time_this_year()
             )
@@ -30,7 +41,7 @@ class Command(BaseCommand):
             song = Song.objects.create(
                 title=fake.sentence(nb_words=3),
                 user=User.objects.order_by('?').first(),
-                album=fake.word(),
+                description=fake.word(),
                 genre=fake.word(),
                 duration=fake.random_int(min=180, max=300),  # Duration in seconds
                 mp3_path=fake.file_path(),
@@ -70,16 +81,16 @@ class Command(BaseCommand):
             )
             playlist.save()
 
-        # Create fake playlist songs
+       # Create fake playlist songs
         for playlist in Playlist.objects.all():
-            for _ in range(5):
-                song = Song.objects.order_by('?').first()
+            songs = list(Song.objects.order_by('?')[:5])  # Lấy ngẫu nhiên 5 bài hát
+            for index, song in enumerate(songs, start=1):  # Bắt đầu order từ 1
                 if not PlaylistSong.objects.filter(playlist=playlist, song=song).exists():
-                    playlist_song = PlaylistSong.objects.create(
+                    PlaylistSong.objects.create(
                         playlist=playlist,
-                        song=song
+                        song=song,
+                        order=index  # Gán thứ tự bài hát trong playlist
                     )
-                    playlist_song.save()
 
         # Create fake playback history
         for user in User.objects.all():
