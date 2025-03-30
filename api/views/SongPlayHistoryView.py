@@ -6,7 +6,7 @@ from services.SongPlayHistoryService import SongPlayHistoryService  # Import ser
 class SongPlayHistoryView(APIView):
     def post(self, request):
         song_id = request.data.get("song_id")
-        user_id = request.data.get("user_id")
+        user_id = request.user.id
 
         if not song_id or not user_id:
             return Response(

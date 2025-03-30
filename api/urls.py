@@ -21,12 +21,17 @@ urlpatterns = [
     path('api/trending/playlists/', TrendingView.as_view(), name='trending_playlists'),
     path('api/trending/albums/', TrendingView.as_view(), name='trending_albums'),
 
-    path('api/song/previous/<int:song_id>/<int:user_id>/', SongView.as_view(), name='previous_song'),
-    path('api/song/next/<int:song_id>/<int:user_id>/', SongView.as_view(), name='next_song'),
+    path('api/song/previous/<int:song_id>/', SongView.as_view(), name='previous_song'),
+    path('api/song/next/<int:song_id>/', SongView.as_view(), name='next_song'),
 
     path('api/history/update/', SongPlayHistoryView.as_view(), name='update_play_history'),
     path('api/account/', AccountView.as_view(), name='account'),
     path('api/playlists/<int:playlist_id>/songs', PlaylistView.as_view(), name='playlist-songs'),
+
+    path('api/playlist/user/<int:song_id>/', PlaylistView.as_view(), name='get_playlists_from_user'),
+    path('api/playlist/add-song/', PlaylistView.as_view(), name='add_song_to_playlist'),
+    path('api/playlist/create/', PlaylistView.as_view(), name='create_playlist'), 
+
 
 ]
 

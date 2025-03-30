@@ -34,7 +34,7 @@ class SongView(APIView):
             "duration": request.data.get("duration"),
             "description": request.data.get("description"),
             "genre": request.data.get("genre"),
-            "user_id": request.data.get("user_id"), 
+            "user_id": request.user.id, 
             "mp3_path": file_url,
             "image_path": image_url
         }
@@ -79,7 +79,7 @@ class SongView(APIView):
                 return Response({"error": "No previous song found"}, status=status.HTTP_404_NOT_FOUND)
 
         elif 'next' in path:  # Nếu URL có chứa "next", lấy bài hát sau đó
-            song = SongService.get_next_song(song_id, user_id)
+            song = SongService.get_next_song(song_id)
             if not song:
                 return Response({"error": "No next song found"}, status=status.HTTP_404_NOT_FOUND)
 

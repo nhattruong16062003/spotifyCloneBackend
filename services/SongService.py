@@ -60,3 +60,9 @@ class SongService:
             return random_song
 
         return None  # Trả về None nếu không có bài hát nào trong hệ thống
+    
+    @staticmethod
+    def get_next_song(current_song_id):
+        """ Lấy bài hát ngẫu nhiên từ bảng Song, nhưng không phải bài hiện tại """
+        random_song = Song.objects.exclude(id=current_song_id).order_by("?").first()
+        return random_song if random_song else None
