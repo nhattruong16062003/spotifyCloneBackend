@@ -8,14 +8,14 @@ from api.serializers.SongSerializer import SongSerializer  # Import SongSerializ
 from services.PlaylistService import PlaylistService
 
 class PlaylistView(APIView):
-    def get(self, request, playlist_id,song_id):
+    def get(self, request, song_id=None, playlist_id=None):
         """API lấy danh sách playlist của user nhưng chưa chứa song_id"""
         if request.path.endswith(f"/api/playlist/user/{song_id}/"):  # Kiểm tra URL
             user_id = request.user.id  # Nếu dùng authentication
             playlists = Playlist.objects.filter(user_id=user_id).exclude(playlistsong__song_id=song_id)
             serializer = PlaylistSerializer(playlists, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        elif request.path.endswith(f"api/playlists/{playlist_id}/songs"):
+        elif request.path.endswith(f"/api/playlists/{playlist_id}/songs/"):
             try:
                 # Lấy playlist theo ID
                 playlist = Playlist.objects.get(id=playlist_id)
