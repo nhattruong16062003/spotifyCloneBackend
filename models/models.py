@@ -4,7 +4,8 @@ from .playlist_song import PlaylistSong
 from .playlist import Playlist
 from .song import Song
 from .subscription import Subscription
-from .transaction import Transaction
 from .user import User
 from .song_play_history import SongPlayHistory
 from .role import Role
+from .premium_plan import PremiumPlan
+from .premium_subscription import PremiumSubscription

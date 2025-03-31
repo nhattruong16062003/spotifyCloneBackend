@@ -1,18 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-from .role import Role 
+from .role import Role
 
 class UserManager(BaseUserManager):
-    def normalize_email(self, email):
-        email = email or ''
-        try:
-            email_name, domain_part = email.strip().rsplit('@', 1)
-        except ValueError:
-            pass
-        else:
-            email = email_name + '@' + domain_part.lower()
-        return email
-
     def create_user(self, email, username, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
@@ -39,8 +29,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, default=3)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    premium_start = models.DateTimeField(null=True, blank=True)
-    premium_end = models.DateTimeField(null=True, blank=True)
     image_path = models.CharField(max_length=255, null=True, blank=True)
 
     objects = UserManager()
@@ -50,3 +38,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+    def get_active_premium(self):
+        """Lấy gói premium hiện tại của user (nếu có)"""
+        from django.utils import timezone
+        from .premium_subscription import PremiumSubscription
+        return self.premium_subscriptions.filter(end_date__gt=timezone.now()).order_by('-end_date').first()

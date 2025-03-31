@@ -61,17 +61,6 @@ class Command(BaseCommand):
             )
             subscription.save()
 
-        # Create fake transactions
-        for user in User.objects.all():
-            transaction = Transaction.objects.create(
-                user=user,
-                amount=fake.pydecimal(left_digits=4, right_digits=2, positive=True),
-                payment_method=fake.random_element(elements=('qr_code', 'vnpay', 'momo')),
-                transaction_date=fake.date_time_this_year(),
-                status=fake.random_element(elements=('pending', 'completed', 'failed'))
-            )
-            transaction.save()
-
         # Create fake playlists
         for user in User.objects.all():
             playlist = Playlist.objects.create(

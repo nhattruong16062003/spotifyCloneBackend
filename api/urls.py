@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views.AuthView import AuthView, ActivateAccountView, GoogleLoginView
 from .views.HomeView import HomeView
 from .views.UserView import UserView
@@ -7,8 +7,10 @@ from .views.TrendingView import TrendingView
 from .views.SongPlayHistoryView import SongPlayHistoryView  
 from .views.AccountView import AccountView
 from .views.PlaylistView import PlaylistView
+from .views.PlanView import PlanDetailView,PlanListView 
 
 urlpatterns = [
+    path('api/', include('payments.urls')),
     path('', HomeView.as_view(), name='home'),
     path('api/auth/<str:action>/', AuthView.as_view(), name='auth_action'),
     path('api/auth/activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
@@ -32,6 +34,8 @@ urlpatterns = [
     path('api/playlist/add-song/', PlaylistView.as_view(), name='add_song_to_playlist'),
     path('api/playlist/create/', PlaylistView.as_view(), name='create_playlist'), 
 
+    path('api/plans/', PlanListView.as_view(), name='plans'),  # Lấy danh sách gói Premium
+    path('api/plans/<int:plan_id>/', PlanDetailView.as_view(), name='plan_detail'),  # Lấy gói Premium theo ID
 
 ]
 
