@@ -18,6 +18,9 @@ class PlaylistView(APIView):
 
     def post(self, request):
         """API tạo playlist hoặc thêm bài hát vào nhiều playlist"""
+        # Kiểm tra người dùng đã login chưa
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'User not authenticated'}, status=401)
         data = request.data
         user_id = request.user.id  # Nếu dùng authentication
 

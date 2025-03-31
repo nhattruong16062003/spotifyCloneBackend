@@ -200,6 +200,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # Corsheaders settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://127.0.0.1:3000",  # Thêm localhost nếu cần
     # Thêm các nguồn gốc khác nếu cần
 ]
 
@@ -223,6 +224,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
+
 
 
 
