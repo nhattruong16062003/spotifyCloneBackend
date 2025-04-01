@@ -66,3 +66,11 @@ class SongService:
         """ Lấy bài hát ngẫu nhiên từ bảng Song, nhưng không phải bài hiện tại """
         random_song = Song.objects.exclude(id=current_song_id).order_by("?").first()
         return random_song if random_song else None
+    
+    @staticmethod
+    def get_songs_by_artist(user_id):
+        """Lấy toàn bộ bài hát của nghệ sĩ và tổng lượt nghe"""
+        return Song.objects.filter(user_id=user_id) \
+            .annotate(total_streams=Count('play_history')) \
+            .values('id', 'title', 'image_path', 'duration', 'uploaded_at', 'total_streams') \
+            .order_by('-uploaded_at')  # Sắp xếp bài hát mới nhất trước
