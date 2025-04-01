@@ -7,6 +7,7 @@ class Playlist(models.Model):
     description = models.TextField(null=True, blank=True)  # Thêm trường mô tả playlist
     created_at = models.DateTimeField(auto_now_add=True)
     image_path = models.CharField(max_length=255, null=True, blank=True)  # New field for image path
+    play_count = models.PositiveIntegerField(default=0)  # Trường đếm số lần phát
 
     def __str__(self):
         return self.name
