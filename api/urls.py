@@ -32,8 +32,15 @@ urlpatterns = [
     path('api/playlist/add-song/', PlaylistView.as_view(), name='add_song_to_playlist'),
     path('api/playlist/create/', PlaylistView.as_view(), name='create_playlist'), 
 
-    path('api/plans/', PlanListView.as_view(), name='plans'),  # Lấy danh sách gói Premium
-    path('api/plans/<int:plan_id>/', PlanDetailView.as_view(), name='plan_detail'),  # Lấy gói Premium theo ID
+    path('api/plans/', PlanListView.as_view(), name='plans'), 
+    path('api/plans/<int:plan_id>/', PlanDetailView.as_view(), name='plan_detail'),
+
+    # ARTIST
+    path('api/artist/songs/', SongView.as_view(), name='artist_song'),
+
+    path('api/artist/albums/', PlaylistView.as_view(), name='artist_album'),
+    path('api/artist/create-album', PlaylistView.as_view(), name='create-album'),
+
 
 ]
 
