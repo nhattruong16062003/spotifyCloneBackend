@@ -28,6 +28,8 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/user/",
             "/api/song/",
             "/api/history/update/",
+            "/api/account/",
+            "/api/playlists/songs/",
         ),
     }
 

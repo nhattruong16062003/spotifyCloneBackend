@@ -43,7 +43,7 @@ class AuthView(APIView):
 
     def register(self, request):
         email = request.data.get('email')
-        username = request.data.get('username')
+        name = request.data.get('username')
         password = request.data.get('password')
         try:
             role_id = 3
@@ -72,6 +72,8 @@ class AuthView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            user.username = email
+            user.name = name
             user.is_active = False
             user.role = role
             user.set_password(password) 
@@ -91,11 +93,15 @@ class AuthView(APIView):
         if error_code:
             return Response({"error_code": error_code}, status=status.HTTP_400_BAD_REQUEST)
 
-        login(request, user)
-        tokens = AuthService.generate_tokens(user)
-        # Lấy thông tin user
-        user_data = UserSerializer(user).data  # Dùng serializer để định dạng user info
-        return Response({"tokens": tokens,"user": user_data}, status=status.HTTP_200_OK)
+        # login(request, user)
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "role":user.role.id    #nếu muốn trả về tên role:  str(user.role)
+        }, status=status.HTTP_200_OK)
+        
         
     def refresh_token(self, request):
         refresh_token = request.data.get("refresh")  
@@ -150,19 +156,17 @@ class GoogleLoginView(APIView):
                 return Response({"error_code": "INVALID_GOOGLE_TOKEN"}, status=status.HTTP_400_BAD_REQUEST)
 
             id_info = response.json()
-
             email = id_info.get("email")
-            google_id = id_info.get("sub")  # Get the Google ID (sub)
+            google_id = id_info.get("sub") 
+            username = id_info.get("name", email) 
+
             if not email or not google_id:
                 return Response({"error_code": "INVALID_GOOGLE_TOKEN"}, status=status.HTTP_400_BAD_REQUEST)
 
-            username = id_info.get("name", email)  # Use the name from Google or fallback to email
-
-            # Check if the user already exists by email
+            # Kiểm tra xem email đã được đăng kí trước đó chưa? 
             try:
                 user = User.objects.get(email=email)
-
-                # Check if the account is not activated
+                # Nếu đã được đăng kí và chưa active
                 if not user.is_active:
                     return Response({"error_code": "ACCOUNT_NOT_ACTIVATED"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -175,6 +179,7 @@ class GoogleLoginView(APIView):
                 # Create a new user if the email does not exist
                 user = User.objects.create(
                     username=username,
+                    name = username,
                     email=email,
                     google_id=google_id,  # Save the Google ID
                 )
@@ -185,9 +190,9 @@ class GoogleLoginView(APIView):
             refresh = RefreshToken.for_user(user)
             return Response({
                 "access": str(refresh.access_token),
-                "refresh": str(refresh)
+                "refresh": str(refresh),
+                "role":user.role.id    #nếu muốn trả về tên role:  str(user.role)
             }, status=status.HTTP_200_OK)
-
         except Exception as e:
             # Log the error for debugging purposes
             print(f"Google Login Error: {str(e)}")
