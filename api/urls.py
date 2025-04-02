@@ -16,7 +16,6 @@ urlpatterns = [
     path('api/auth/activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
     path('api/auth/login/google/', GoogleLoginView.as_view(), name='google_login'),
     path('api/user/<int:user_id>/', UserView.as_view(), name='user'),
-    path('api/song/', SongView.as_view(), name='add_song'),
     path('api/song/<int:song_id>/', SongView.as_view(), name='update_delete_song'),
 
     path('api/trending/songs/', TrendingView.as_view(), name='trending_songs'),
@@ -40,6 +39,8 @@ urlpatterns = [
 
     path('api/artist/albums/', PlaylistView.as_view(), name='artist_album'),
     path('api/artist/create-album', PlaylistView.as_view(), name='create-album'),
+
+    path('api/song/', SongView.as_view(), name='add_song'), #upload
 
 
 ]
