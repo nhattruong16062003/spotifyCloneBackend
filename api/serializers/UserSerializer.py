@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         #Serializer giúp validate dữ liệu đầu vào 
 
         #Định nghĩa các trước của module user sẽ được sử dụng trong serializer, có nghĩa là sẽ chuyển đổi những trường nào. 
-        fields = ['username', 'email', 'password','image_path']
+        fields = ['name', 'email', 'password','image_path']
 
         extra_kwargs = {
             'password': {'write_only': True}

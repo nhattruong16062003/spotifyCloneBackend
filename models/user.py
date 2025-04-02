@@ -23,14 +23,15 @@ class UserManager(BaseUserManager):
         return self.create_user(email, username, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=150)
+    username = models.CharField(max_length=150,unique = True)
     email = models.EmailField(unique=True)
     google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, default=3)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     image_path = models.CharField(max_length=255, null=True, blank=True)
-
+    name = models.CharField(max_length=150, null=True,blank=True)
+    is_ban = models.BooleanField(default=False)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'

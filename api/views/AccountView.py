@@ -12,6 +12,9 @@ from services.UploadService import UploadService
 from PIL import Image
 from io import BytesIO
 from services.AccountService import AccountService
+from models.user import User
+from django.shortcuts import get_object_or_404
+
 
 
 class AccountView(APIView):
@@ -45,36 +48,17 @@ class AccountView(APIView):
         user = request.user
         data = request.data
         files = request.FILES
-
+        action = data.get('action')
+        image_path = user.image_path 
         try:
-            # Gọi service để xử lý logic cập nhật
-            updated_user = AccountService.update_user(user, data, files)
+            updated_user = AccountService.update_user(user, data, files, image_path,action)
+            updated_user_data = UserSerializer(updated_user).data
+            return Response(
+                {"message_code": "USER_UPDATE_SUCCESS", "user": updated_user_data},
+                status=status.HTTP_200_OK,
+            )
         except Exception as e:
-            error_message = str(e)
-            if "IMAGE_PROCESSING_FAILED" in error_message:
-                return Response(
-                    {"message_code": "IMAGE_PROCESSING_FAILED", "details": error_message},
-                    status=500,
-                )
-            elif "IMAGE_UPLOAD_FAILED" in error_message:
-                return Response(
-                    {"message_code": "IMAGE_UPLOAD_FAILED", "details": error_message},
-                    status=500,
-                )
-            elif "USER_UPDATE_FAILED" in error_message:
-                return Response(
-                    {"message_code": "USER_UPDATE_FAILED", "details": error_message},
-                    status=500,
-                )
-            else:
-                return Response(
-                    {"message_code": "UNKNOWN_ERROR", "details": error_message},
-                    status=500,
-                )
-
-        # Serialize thông tin người dùng sau khi cập nhật
-        updated_user_data = UserSerializer(updated_user).data
-        return Response(
-            {"message_code": "USER_UPDATE_SUCCESS", "user": updated_user_data},
-            status=status.HTTP_200_OK,
-        )
+            return Response(
+                {"message_code": "ERROR_OCCURRED", "details": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
