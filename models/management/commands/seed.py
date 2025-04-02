@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from faker import Faker
-from models.models import User, Song, Subscription, Transaction, Playlist, PlaylistSong, PlaybackHistory,SongPlayHistory,Role
+from models.models import User, Song, Playlist, PlaylistSong, PlaybackHistory,SongPlayHistory,Role
 import random
 from django.utils.timezone import now
 from datetime import timedelta
@@ -50,16 +50,16 @@ class Command(BaseCommand):
             )
             song.save()
 
-        # Create fake subscriptions
-        for user in User.objects.all():
-            subscription = Subscription.objects.create(
-                user=user,
-                plan=fake.random_element(elements=('free', 'premium')),
-                start_date=fake.date_time_this_year(),
-                end_date=fake.date_time_this_year(),
-                status=fake.random_element(elements=('active', 'expired'))
-            )
-            subscription.save()
+        # # Create fake subscriptions
+        # for user in User.objects.all():
+        #     subscription = Subscription.objects.create(
+        #         user=user,
+        #         plan=fake.random_element(elements=('free', 'premium')),
+        #         start_date=fake.date_time_this_year(),
+        #         end_date=fake.date_time_this_year(),
+        #         status=fake.random_element(elements=('active', 'expired'))
+        #     )
+        #     subscription.save()
 
         # Create fake playlists
         for user in User.objects.all():
