@@ -20,6 +20,8 @@ from django.http import HttpResponseRedirect
 import requests
 from services.AuthService import AuthService
 from rest_framework.permissions import AllowAny
+from models.role import Role 
+from api.helpers.Validate import validate_password,validate_email
 
 
 
@@ -42,17 +44,37 @@ class AuthView(APIView):
     def register(self, request):
         email = request.data.get('email')
         username = request.data.get('username')
+        password = request.data.get('password')
+        try:
+            role_id = 3
+            # Lấy Role với id=3 (nếu tồn tại)
+            role = Role.objects.get(id=role_id)
+        except Role.DoesNotExist:
+            return Response({
+                "error_code": "ROLE_NOT_FOUND", 
+                "details": "Role with ID 3 does not exist."
+            }, status=status.HTTP_400_BAD_REQUEST)
 
+
+        # Validate email
+        if not validate_email(email):
+            return JsonResponse({"error_code": "INVALID_DATA"}, status=400)   
+
+        # Validate password
+        if not validate_password(password):
+            return JsonResponse({
+                "error_code": "INVALID_DATA"
+            }, status=400)
+            
         if User.objects.filter(email=email).exists():
             return Response({"error_code": "EMAIL_ALREADY_EXISTS"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if User.objects.filter(username=username).exists():
-            return Response({"error_code": "USERNAME_ALREADY_EXISTS"}, status=status.HTTP_400_BAD_REQUEST)
-
+          
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             user.is_active = False
+            user.role = role
+            user.set_password(password) 
             user.save()
             AuthService.send_activation_email(user, request)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -71,8 +93,10 @@ class AuthView(APIView):
 
         login(request, user)
         tokens = AuthService.generate_tokens(user)
-        return Response(tokens, status=status.HTTP_200_OK)
-
+        # Lấy thông tin user
+        user_data = UserSerializer(user).data  # Dùng serializer để định dạng user info
+        return Response({"tokens": tokens,"user": user_data}, status=status.HTTP_200_OK)
+        
     def refresh_token(self, request):
         refresh_token = request.data.get("refresh")  
         print(f"Before authentication: {refresh_token}")
