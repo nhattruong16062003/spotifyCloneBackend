@@ -22,11 +22,14 @@ class RoleCheckMiddleware(MiddlewareMixin):
         ),
         2: (  # ARTIST
             "/api/artist/",
+            "/api/song/",
         ),
         3: (  # USER
             "/api/user/",
             "/api/song/",
             "/api/history/update/",
+            "/api/account/",
+            "/api/playlists/songs/",
         ),
     }
 
