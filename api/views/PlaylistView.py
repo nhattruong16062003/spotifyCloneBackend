@@ -114,14 +114,14 @@ class PlaylistView(APIView):
             try:
                 songs = json.loads(songs_json)
             except json.JSONDecodeError:
-                if image_name:
-                    UploadService.delete_image_from_s3(image_name)  # Sửa đây
+                if image_url:
+                    UploadService.delete_image_from_s3(image_url)  # Sửa đây
                 return Response({"error": "Invalid songs data format"}, status=400)
 
             # Kiểm tra dữ liệu bắt buộc
             if not album_name or not description or not songs:
-                if image_name:
-                    UploadService.delete_image_from_s3(image_name)  # Sửa đây
+                if image_url:
+                    UploadService.delete_image_from_s3(image_url)  # Sửa đây
                 return Response({"error": "Missing required fields: name, description, or songs"}, status=400)
 
             # B3: Gọi PlaylistService để tạo album và thêm bài hát

@@ -90,6 +90,9 @@ MIDDLEWARE = [
 
     # Corsheaders
     'corsheaders.middleware.CorsMiddleware',
+
+    # Thêm Middleware kiểm tra quyền truy cập theo Role
+    'middleware.RoleCheckMiddleware.RoleCheckMiddleware',
 ]
 
 
@@ -175,6 +178,9 @@ SITE_ID = 1
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'rest_framework.authentication.SessionAuthentication',
+    'rest_framework.authentication.BasicAuthentication',
+    'rest_framework_simplejwt.authentication.JWTAuthentication', 
 )
 
 ACCOUNT_EMAIL_REQUIRED = True
