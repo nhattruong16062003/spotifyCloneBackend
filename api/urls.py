@@ -16,7 +16,6 @@ urlpatterns = [
     path('api/auth/activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
     path('api/auth/login/google/', GoogleLoginView.as_view(), name='google_login'),
     path('api/user/<int:user_id>/', UserView.as_view(), name='user'),
-    path('api/song/', SongView.as_view(), name='add_song'),
     path('api/song/<int:song_id>/', SongView.as_view(), name='update_delete_song'),
 
     path('api/trending/songs/', TrendingView.as_view(), name='trending_songs'),
@@ -28,7 +27,7 @@ urlpatterns = [
 
     path('api/history/update/', SongPlayHistoryView.as_view(), name='update_play_history'),
     path('api/account/', AccountView.as_view(), name='account'),
-    path('api/playlists/<int:playlist_id>/songs/', PlaylistView.as_view(), name='playlist-songs'),
+    path('api/playlists/songs/<int:playlist_id>/', PlaylistView.as_view(), name='playlist-songs'),
 
     path('api/playlist/user/<int:song_id>/', PlaylistView.as_view(), name='get_playlists_from_user'),
     path('api/playlist/add-song/', PlaylistView.as_view(), name='add_song_to_playlist'),
@@ -42,6 +41,8 @@ urlpatterns = [
 
     path('api/artist/albums/', PlaylistView.as_view(), name='artist_album'),
     path('api/artist/create-album', PlaylistView.as_view(), name='create-album'),
+
+    path('api/song/', SongView.as_view(), name='add_song'), #upload
 
 
 ]
