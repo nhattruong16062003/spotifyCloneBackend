@@ -19,7 +19,7 @@ class PlaylistView(APIView):
             playlists = Playlist.objects.filter(user_id=user_id).exclude(playlistsong__song_id=song_id)
             serializer = PlaylistSerializer(playlists, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        elif request.path.endswith(f"/api/playlists/{playlist_id}/songs/"):
+        elif request.path.endswith(f"/api/playlists/songs/{playlist_id}/"):
             try:
                 # Lấy playlist theo ID
                 playlist = Playlist.objects.get(id=playlist_id)
