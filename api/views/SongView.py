@@ -84,19 +84,23 @@ class SongView(APIView):
         user_id=request.user.id
 
         if 'api/song/previous/' in path:  # Nếu URL có chứa "previous", lấy bài hát trước đó
-            song = SongService.get_previous_song(song_id, user_id)
-            if not song:
+            songid = SongService.get_previous_song(song_id, user_id)
+            if not songid:
                 return Response({"error": "No previous song found"}, status=status.HTTP_404_NOT_FOUND)
-
+            return Response({
+                "id": songid,
+            }, status=status.HTTP_200_OK) 
         elif 'api/song/next/' in path:  # Nếu URL có chứa "next", lấy bài hát sau đó
-            song = SongService.get_next_song(song_id)
-            if not song:
+            songid = SongService.get_next_song(song_id)
+            if not songid:
                 return Response({"error": "No next song found"}, status=status.HTTP_404_NOT_FOUND)
-
+            return Response({
+                "id": songid,
+            }, status=status.HTTP_200_OK) 
         elif 'api/song/' in path:  # Nếu URL có chứa "song", lấy thông tin bài hát theo ID
             song = SongService.get_song(song_id)
             if not song:
-                return Response({"error": "Song not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Song not found"}, status=status.HTTP_404_NOT_FOUND)  
         elif 'api/artist/songs/' in path:  # Nếu URL có chứa "artist/songs"
             songs = SongService.get_songs_by_artist(user_id)
             return Response(songs, status=status.HTTP_200_OK)
