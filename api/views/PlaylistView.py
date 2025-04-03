@@ -10,6 +10,7 @@ from django.db.models import Count
 from services.UploadService import UploadService
 from rest_framework.response import Response
 from django.http import JsonResponse
+from django.db import transaction
 
 class PlaylistView(APIView):
     def get(self, request, song_id=None, playlist_id=None):
@@ -61,7 +62,7 @@ class PlaylistView(APIView):
 
     def post(self, request):
         if request.path.endswith("api/playlist/create/"):            
-            """API tạo playlist hoặc thêm bài hát vào nhiều playlist"""
+            """API tạo playlist"""
             # Kiểm tra người dùng đã login chưa
             if not request.user.is_authenticated:
                 return JsonResponse({'error': 'User not authenticated'}, status=401)
@@ -73,20 +74,33 @@ class PlaylistView(APIView):
 
                 result, status_code = PlaylistService.create_playlist(user_id, data["name"])
                 return Response(result, status=status_code)
+            
+            return Response({"error": "Invalid request path"}, status=status.HTTP_400_BAD_REQUEST)
 
-            if not request.path.endswith("/api/playlist/add-song/"):
-                return Response({"error": "Invalid request path"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Xử lý thêm bài hát vào playlist (giữ nguyên code cũ)
+        if request.path.endswith("/api/playlist/add-song/"):
+            # Kiểm tra người dùng đã login chưa
+            if not request.user.is_authenticated:
+                return JsonResponse({'error': 'User not authenticated'}, status=401)
+            data = request.data
+            user_id = request.user.id  # Nếu dùng authentication
+            # Xử lý thêm bài hát vào playlist
+
             song_id = data.get("song_id")
             playlist_ids = data.get("playlists", [])  
 
             if not song_id or not playlist_ids:
                 return Response({"error": "Thiếu song_id hoặc danh sách playlist_ids"}, status=status.HTTP_400_BAD_REQUEST)
-
-            result, status_code = PlaylistService.add_song_to_playlists(user_id, song_id, playlist_ids)
-            return Response(result, status=status_code)
-      
+            
+            try:
+                with transaction.atomic():  # Bọc trong transaction
+                    result, status_code = PlaylistService.add_song_to_playlists(user_id, song_id, playlist_ids)
+                    if status_code >= 400:  # Nếu service trả về lỗi
+                        raise Exception(result.get("error", "Failed to add song to playlists"))
+                    return Response(result, status=status_code)
+            except Exception as e:
+                # Nếu có lỗi, transaction sẽ tự động rollback
+                return Response({"error": str(e)}, status=500)
     
         if request.path.endswith("api/artist/create-album"):
             if not request.user.is_authenticated:
@@ -115,57 +129,50 @@ class PlaylistView(APIView):
                 songs = json.loads(songs_json)
             except json.JSONDecodeError:
                 if image_url:
-                    UploadService.delete_image_from_s3(image_url)  # Sửa đây
+                    UploadService.delete_image_from_s3(image_url)
                 return Response({"error": "Invalid songs data format"}, status=400)
 
             # Kiểm tra dữ liệu bắt buộc
             if not album_name or not description or not songs:
                 if image_url:
-                    UploadService.delete_image_from_s3(image_url)  # Sửa đây
+                    UploadService.delete_image_from_s3(image_url)
                 return Response({"error": "Missing required fields: name, description, or songs"}, status=400)
 
-            # B3: Gọi PlaylistService để tạo album và thêm bài hát
+            # B3: Bao bọc các thao tác DB trong transaction
             try:
-                album_data = {
-                    "name": album_name,
-                    "description": description,
-                    "image_path": image_url,
-                    "user_id": user_id,
-                }
-                album = PlaylistService.create_album(album_data)
-                if isinstance(album, tuple):  # Kiểm tra nếu album là tuple
-                    album = album[0]  # Lấy phần tử đầu tiên từ tuple (nếu cần)
-                if not album:
-                    if image_url:
-                        UploadService.delete_image_from_s3(image_url)
-                    return Response({"error": "Failed to create album"}, status=500)
+                with transaction.atomic():  # Bắt đầu transaction
+                    # Tạo album
+                    album_data = {
+                        "name": album_name,
+                        "description": description,
+                        "image_path": image_url,
+                        "user_id": user_id,
+                    }
+                    album = PlaylistService.create_album(album_data)
+                    if isinstance(album, tuple):  # Kiểm tra nếu album là tuple
+                        album = album[0]
+                    if not album:
+                        raise Exception("Failed to create album")
 
-                # Thêm bài hát vào album
-                for song in songs:
-                    song_id = song.get("id")
-                    if not song_id:
-                        PlaylistService.delete_album(album["id"])
-                        if image_url:
-                            UploadService.delete_image_from_s3(image_url)
-                        return Response({"error": "Invalid song data"}, status=400)
+                    # Thêm bài hát vào album
+                    for song in songs:
+                        song_id = song.get("id")
+                        if not song_id:
+                            raise Exception("Invalid song data")
+                        success = PlaylistService.add_song_to_album(album["id"], song_id, user_id)
+                        if not success:
+                            raise Exception(f"Failed to add song {song_id} to album")
 
-                    success = PlaylistService.add_song_to_album(album["id"], song_id, user_id)
-                    if not success:
-                        PlaylistService.delete_album(album["id"])
-                        if image_url:
-                            UploadService.delete_image_from_s3(image_url)
-                        return Response({"error": f"Failed to add song {song_id} to album"}, status=500)
-
-                return Response({
-                    "message": "Album created successfully",
-                    "album_id": album["id"]
-                }, status=201)
+                    # Nếu mọi thứ thành công, transaction sẽ tự động commit
+                    return Response({
+                        "message": "Album created successfully",
+                        "album_id": album["id"]
+                    }, status=201)
 
             except Exception as e:
+                # Nếu có lỗi, transaction sẽ rollback tự động
                 if image_url:
                     UploadService.delete_image_from_s3(image_url)
-                if 'album' in locals() and album:
-                    PlaylistService.delete_album(album["id"])
                 return Response({"error": f"An error occurred: {str(e)}"}, status=500)
 
         return Response({"error": "Invalid endpoint"}, status=404)

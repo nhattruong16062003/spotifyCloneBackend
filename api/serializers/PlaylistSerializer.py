@@ -2,7 +2,7 @@ from rest_framework import serializers
 from models.playlist import Playlist
 
 class PlaylistSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)  # Truy cập user.username
+    username = serializers.CharField(source='user.name', read_only=True)  # Truy cập user.name
 
     class Meta:
         model = Playlist

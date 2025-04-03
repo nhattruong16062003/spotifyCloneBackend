@@ -8,6 +8,7 @@ from .views.SongPlayHistoryView import SongPlayHistoryView
 from .views.AccountView import AccountView
 from .views.PlaylistView import PlaylistView
 from .views.PlanView import PlanDetailView,PlanListView 
+from .views.ArtistCollabView import FindArtistCollab
 
 urlpatterns = [
     path('api/', include('payments.urls')),
@@ -42,7 +43,8 @@ urlpatterns = [
     path('api/artist/albums/', PlaylistView.as_view(), name='artist_album'),
     path('api/artist/create-album', PlaylistView.as_view(), name='create-album'),
 
-    path('api/song/', SongView.as_view(), name='add_song'), #upload
+    path('api/artist/song/', SongView.as_view(), name='add_song'), #upload
+    path('api/artist/fetch-artist-collab/', FindArtistCollab.as_view(), name='get-artist-collab'), 
 
 
 ]
