@@ -21,9 +21,11 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/admin/",
         ),
         2: (  # ARTIST
-            "/api/artist/",
-            "/api/song/",
+            "/api/artist/fetch-artist-collab/",
             "/api/account/",
+            "/api/artist/songs/",
+            "/api/artist/albums/",
+            "/api/artist/song/"
         ),
         3: (  # USER
             "/api/user/",
@@ -35,6 +37,8 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/create-payment/",
             "/api/payment-return/",
             "/api/playlist/user/",
+            "/api/playlist/create/",
+            "/api/playlist/add-song/",
         ),
     }
 

@@ -16,7 +16,7 @@ from api.serializers.UserSerializer import UserSerializer
 from django.utils.crypto import get_random_string
 import google.auth.transport.requests
 import google.oauth2.id_token
-from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 import requests
 from services.AuthService import AuthService
 from rest_framework.permissions import AllowAny
