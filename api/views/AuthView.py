@@ -10,6 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.urls import reverse
+from django.http import JsonResponse
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
 from api.serializers.UserSerializer import UserSerializer
@@ -19,14 +20,17 @@ import google.oauth2.id_token
 from django.http import HttpResponseRedirect
 import requests
 from services.AuthService import AuthService
+from services.UploadService import UploadService
 from rest_framework.permissions import AllowAny
 from models.role import Role 
 from api.helpers.Validate import validate_password,validate_email
+from models.artist_registration import ArtistRegistration
+from django.db import transaction
+
 
 
 
 User = get_user_model()
-
 class AuthView(APIView):
     # permission_classes = [AllowAny]  # Không yêu cầu xác thực
     def post(self, request, action):
@@ -38,16 +42,39 @@ class AuthView(APIView):
             return self.refresh_token(request)
         elif action == 'password-reset':
             return self.password_reset(request)
+        elif action == 'register-artist':
+            return self.register_artist(request)
         else:
             return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    
+
+
+    def register_artist(self, request):
+        try:
+            # Gọi AuthService để xử lý đăng ký nghệ sĩ
+            response = AuthService.register_artist(request.data, request.FILES)
+            return response
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+
 
     def register(self, request):
         email = request.data.get('email')
         name = request.data.get('username')
         password = request.data.get('password')
+        
         try:
-            role_id = 3
             # Lấy Role với id=3 (nếu tồn tại)
+            role_id = 3
             role = Role.objects.get(id=role_id)
         except Role.DoesNotExist:
             return Response({
@@ -55,32 +82,50 @@ class AuthView(APIView):
                 "details": "Role with ID 3 does not exist."
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
         # Validate email
         if not validate_email(email):
-            return JsonResponse({"error_code": "INVALID_DATA"}, status=400)   
+            return JsonResponse({"error_code": "INVALID_DATA"}, status=400)
 
         # Validate password
         if not validate_password(password):
             return JsonResponse({
                 "error_code": "INVALID_DATA"
             }, status=400)
-            
+
+        # Check if email already exists
         if User.objects.filter(email=email).exists():
             return Response({"error_code": "EMAIL_ALREADY_EXISTS"}, status=status.HTTP_400_BAD_REQUEST)
-          
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            user.username = email
-            user.name = name
-            user.is_active = False
-            user.role = role
-            user.set_password(password) 
-            user.save()
-            AuthService.send_activation_email(user, request)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response({"error_code": "INVALID_DATA", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Start transaction for user registration
+        with transaction.atomic():
+            try:
+                # Serialize user data
+                serializer = UserSerializer(data=request.data)
+                if serializer.is_valid():
+                    # Create and save the user instance
+                    user = serializer.save()
+                    user.username = email
+                    user.name = name
+                    user.is_active = False  # Account is inactive initially
+                    user.role = role
+                    user.set_password(password)  # Hash the password
+                    user.save()
+
+                    # Send activation email
+                    AuthService.send_activation_email(user, request)
+
+                    # Return user data upon successful creation
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+                # If serializer is not valid, raise an exception
+                raise ValueError("User data is invalid")
+            
+            except Exception as e:
+                # Rollback the transaction and handle the error
+                return Response({
+                    "error_code": "REGISTRATION_FAILED",
+                    "details": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def login(self, request):
         if request.user.is_authenticated:

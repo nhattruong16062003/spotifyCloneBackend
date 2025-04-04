@@ -9,16 +9,26 @@ class RoleCheckMiddleware(MiddlewareMixin):
     PUBLIC_ENDPOINTS = (
         "/api/auth/login/",
         "/api/auth/register/",
+        "/api/auth/register-artist/",
         "/api/auth/refresh/",
         "/api/trending/playlists/",
         "/api/trending/songs/",
         "/api/trending/albums/",
+        "/api/auth/activate/<uidb64>/<token>/",
+        "/api/auth/login/google/"
+       
     )
 
     # Quyền truy cập theo role
     ROLE_PERMISSIONS = {
         1: (  # ADMIN
             "/api/admin/",
+            "/api/admin/artist-registration-requests/",
+            "/api/admin/<str:action>/<int:id>/",
+            "/api/admin/accounts/",
+            "/api/admin/accounts/<str:action>/<int:id>/",
+
+          
         ),
         2: (  # ARTIST
             "/api/artist/",
