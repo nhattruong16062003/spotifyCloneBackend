@@ -9,4 +9,5 @@ from .song_play_history import SongPlayHistory
 from .role import Role
 from .premium_plan import PremiumPlan
 from .premium_subscription import PremiumSubscription
+from .artist_registration import ArtistRegistration
 from .artist_collab import ArtistCollab
