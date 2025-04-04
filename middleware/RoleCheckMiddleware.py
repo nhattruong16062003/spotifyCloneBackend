@@ -14,9 +14,9 @@ class RoleCheckMiddleware(MiddlewareMixin):
         "/api/trending/playlists/",
         "/api/trending/songs/",
         "/api/trending/albums/",
-        "/api/auth/activate/<uidb64>/<token>/",
-        "/api/auth/login/google/"
-       
+        "/api/auth/activate/",
+        "/api/auth/login/google/",
+        "/api/auth/password-reset/",
     )
 
     # Quyền truy cập theo role
@@ -31,8 +31,11 @@ class RoleCheckMiddleware(MiddlewareMixin):
           
         ),
         2: (  # ARTIST
-            "/api/artist/",
-            "/api/song/",
+            "/api/artist/fetch-artist-collab/",
+            "/api/account/",
+            "/api/artist/songs/",
+            "/api/artist/albums/",
+            "/api/artist/song/"
         ),
         3: (  # USER
             "/api/user/",
@@ -40,6 +43,12 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/history/update/",
             "/api/account/",
             "/api/playlists/songs/",
+            "/api/plans/",
+            "/api/create-payment/",
+            "/api/payment-return/",
+            "/api/playlist/user/",
+            "/api/playlist/create/",
+            "/api/playlist/add-song/",
         ),
     }
 
@@ -59,6 +68,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
                 pass  # Giữ request.user là AnonymousUser nếu token lỗi
 
         # Bỏ qua kiểm tra nếu là endpoint công khai
+        print(self._is_public_endpoint(request.path))
         if self._is_public_endpoint(request.path):
             return None
 

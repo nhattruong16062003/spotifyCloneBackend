@@ -23,7 +23,8 @@ class AuthService:
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
-        activation_url = f"{request.scheme}://{request.get_host()}{activation_link}"
+        # activation_url = f"{request.scheme}://{request.get_host()}{activation_link}"
+        activation_url = f"http://localhost:3000/activate/{uid}/{token}"
         subject = 'Activate your account'
         message = f'Hi {user.username}, please click the link to activate your account: {activation_url}'
         email_from = settings.EMAIL_HOST_USER

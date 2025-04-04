@@ -17,7 +17,7 @@ from api.serializers.UserSerializer import UserSerializer
 from django.utils.crypto import get_random_string
 import google.auth.transport.requests
 import google.oauth2.id_token
-from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 import requests
 from services.AuthService import AuthService
 from services.UploadService import UploadService
@@ -47,9 +47,6 @@ class AuthView(APIView):
         else:
             return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-    
 
 
     def register_artist(self, request):

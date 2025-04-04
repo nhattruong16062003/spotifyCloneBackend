@@ -49,24 +49,36 @@ class SongService:
                 .first()
             )
             if previous_song:
-                return previous_song.song  # Trả về bài hát trước đó
+                return previous_song.song_id  # Trả về bài hát trước đó
         except SongPlayHistory.DoesNotExist:
             pass  # Nếu không có lịch sử, lấy bài ngẫu nhiên
 
-        # Lấy bài hát ngẫu nhiên nếu không tìm thấy bài hát trước đó
-        song_count = Song.objects.count()
-        if song_count > 0:
-            random_song = Song.objects.order_by("?").first()  # Lấy bài ngẫu nhiên
-            return random_song
+        # Lấy tất cả bài hát khác ngoài bài hiện tại
+        songs = Song.objects.exclude(id=current_song_id)    
+        
+        if songs.count() > 0:
+            # Chọn bài hát ngẫu nhiên
+            random_song = songs.order_by("?").first()
+     
+            return random_song.id
 
         return None  # Trả về None nếu không có bài hát nào trong hệ thống
     
     @staticmethod
-    def get_next_song(current_song_id):
-        """ Lấy bài hát ngẫu nhiên từ bảng Song, nhưng không phải bài hiện tại """
-        random_song = Song.objects.exclude(id=current_song_id).order_by("?").first()
-        return random_song if random_song else None
-    
+    def get_next_song(current_song_id):        
+        # Lấy tất cả bài hát khác ngoài bài hiện tại
+        songs = Song.objects.exclude(id=current_song_id)    
+        
+        if songs.count() > 0:
+            # Chọn bài hát ngẫu nhiên
+            random_song = songs.order_by("?").first()
+     
+            return random_song.id
+        else:
+            print("No other song available.")
+            return None
+
+        
     @staticmethod
     def get_songs_by_artist(user_id):
         """Lấy toàn bộ bài hát của nghệ sĩ và tổng lượt nghe"""
