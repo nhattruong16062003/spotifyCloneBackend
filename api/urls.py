@@ -3,6 +3,7 @@ from .views.AuthView import AuthView, ActivateAccountView, GoogleLoginView
 from .views.HomeView import HomeView
 from .views.UserView import UserView
 from .views.SongView import SongView
+from .views.SearchView import SearchView
 from .views.TrendingView import TrendingView
 from .views.SongPlayHistoryView import SongPlayHistoryView  
 from .views.AccountView import AccountView
@@ -16,6 +17,7 @@ urlpatterns = [
     path('api/auth/activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
     path('api/auth/login/google/', GoogleLoginView.as_view(), name='google_login'),
     path('api/user/<int:user_id>/', UserView.as_view(), name='user'),
+    path('api/search/', SearchView.as_view(), name='search'),
     path('api/song/<int:song_id>/', SongView.as_view(), name='update_delete_song'),
 
     path('api/trending/songs/', TrendingView.as_view(), name='trending_songs'),
