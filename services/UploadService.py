@@ -28,7 +28,7 @@ class UploadService:
         try:
             # Tải tệp lên S3 với tên tệp duy nhất
             s3.upload_fileobj(file, settings.MP3_AWS_STORAGE_BUCKET_NAME, unique_file_name)
-            file_url = f"{settings.MP3_AWS_S3_CUSTOM_DOMAIN}/{unique_file_name}"
+            file_url = f"{settings.MP3_AWS_CDN_URL}/{unique_file_name}"
             return file_url
         except (NoCredentialsError, PartialCredentialsError) as e:
             print(e)
@@ -151,6 +151,7 @@ class UploadService:
 
         except (NoCredentialsError, PartialCredentialsError) as e:
             print(f"AWS credentials error: {e}")
+
             return None
         except Exception as e:
             print(f"Error uploading image: {e}")
