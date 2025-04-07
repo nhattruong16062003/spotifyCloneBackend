@@ -64,9 +64,10 @@ class UploadService:
     def upload_image_to_s3(image, image_name):
         # Tạo tên tệp duy nhất bằng UUID và giữ lại phần mở rộng của tệp gốc
         unique_id = uuid.uuid4().hex
-        file_extension = os.path.splitext(image_name)[1]
+        file_extension = os.path.splitext(image_name)[1].lower()  # Lấy đuôi file và chuyển thành chữ thường
         unique_image_name = f"{unique_id}{file_extension}"
 
+        # Khởi tạo client S3
         s3 = boto3.client(
             's3',
             aws_access_key_id=settings.IMG_AWS_ACCESS_KEY_ID,
@@ -75,18 +76,50 @@ class UploadService:
         )
 
         try:
-            # Nén ảnh trước khi upload
-            image = Image.open(image)
+            # Mở ảnh bằng Pillow
+            img = Image.open(image)
+            
+            # Chuẩn bị buffer
             buffer = BytesIO()
-            image.save(buffer, format='JPEG', quality=85)
+            
+            # Xác định định dạng dựa trên đuôi file
+            if file_extension in ['.png']:
+                # Giữ nguyên định dạng PNG, tối ưu hóa nếu cần
+                img.save(buffer, format='PNG', optimize=True)
+                content_type = 'image/png'
+            elif file_extension in ['.jpg', '.jpeg']:
+                # Chuyển RGBA sang RGB nếu cần, lưu dưới dạng JPEG
+                if img.mode == 'RGBA':
+                    img = img.convert('RGB')
+                img.save(buffer, format='JPEG', quality=85)
+                content_type = 'image/jpeg'
+            else:
+                # Mặc định dùng JPEG nếu định dạng không được hỗ trợ
+                if img.mode == 'RGBA':
+                    img = img.convert('RGB')
+                img.save(buffer, format='JPEG', quality=85)
+                content_type = 'image/jpeg'
+                unique_image_name = f"{unique_id}.jpg"  # Đổi tên file nếu cần
+
             buffer.seek(0)
 
-            # Tải ảnh lên S3 với tên tệp duy nhất
-            s3.upload_fileobj(buffer, settings.IMG_AWS_STORAGE_BUCKET_NAME, unique_image_name)
+            # Tải ảnh lên S3 với tên tệp duy nhất và content type phù hợp
+            s3.upload_fileobj(
+                buffer,
+                settings.IMG_AWS_STORAGE_BUCKET_NAME,
+                unique_image_name,
+                ExtraArgs={'ContentType': content_type}  # Đặt content type cho S3
+            )
+            
+            # Trả về URL của ảnh
             image_url = f"{settings.IMG_AWS_S3_CUSTOM_DOMAIN}/{unique_image_name}"
             return image_url
+
         except (NoCredentialsError, PartialCredentialsError) as e:
-            print(e)
+            print(f"AWS credentials error: {e}")
+            return None
+        except Exception as e:
+            print(f"Error uploading image: {e}")
             return None
         
     @staticmethod
