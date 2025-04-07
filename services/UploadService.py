@@ -10,6 +10,9 @@ from urllib.parse import urlparse
 class UploadService:
     @staticmethod
     def upload_mp3_to_s3(file, file_name):
+        SECRET_KEY=settings.SECRET_KEY
+        print("key",SECRET_KEY)
+        
         # Tạo tên tệp duy nhất bằng UUID và giữ lại phần mở rộng của tệp gốc
         unique_id = uuid.uuid4().hex
         file_extension = os.path.splitext(file_name)[1]
@@ -60,6 +63,37 @@ class UploadService:
             return False
         
 
+    # @staticmethod
+    # def upload_image_to_s3(image, image_name):
+    #     # Tạo tên tệp duy nhất bằng UUID và giữ lại phần mở rộng của tệp gốc
+    #     unique_id = uuid.uuid4().hex
+    #     file_extension = os.path.splitext(image_name)[1]
+    #     unique_image_name = f"{unique_id}{file_extension}"
+
+    #     s3 = boto3.client(
+    #         's3',
+    #         aws_access_key_id=settings.IMG_AWS_ACCESS_KEY_ID,
+    #         aws_secret_access_key=settings.IMG_AWS_SECRET_ACCESS_KEY,
+    #         region_name=settings.IMG_AWS_S3_REGION_NAME
+    #     )
+
+    #     try:
+    #         # Nén ảnh trước khi upload
+    #         image = Image.open(image)
+    #         buffer = BytesIO()
+    #         image.save(buffer, format='JPEG', quality=85)
+    #         buffer.seek(0)
+
+    #         # Tải ảnh lên S3 với tên tệp duy nhất
+    #         s3.upload_fileobj(buffer, settings.IMG_AWS_STORAGE_BUCKET_NAME, unique_image_name)
+    #         image_url = f"{settings.IMG_AWS_S3_CUSTOM_DOMAIN}/{unique_image_name}"
+    #         return image_url
+    #     except (NoCredentialsError, PartialCredentialsError) as e:
+    #         print(e)
+    #         return None
+        
+
+    #Thay đổi hàm để có thể upload ảnh dưới nhiều định dạng khác nhau
     @staticmethod
     def upload_image_to_s3(image, image_name):
         # Tạo tên tệp duy nhất bằng UUID và giữ lại phần mở rộng của tệp gốc
@@ -117,11 +151,13 @@ class UploadService:
 
         except (NoCredentialsError, PartialCredentialsError) as e:
             print(f"AWS credentials error: {e}")
+
             return None
         except Exception as e:
             print(f"Error uploading image: {e}")
             return None
-        
+
+
     @staticmethod
     def delete_image_from_s3(url):
         s3 = boto3.client(

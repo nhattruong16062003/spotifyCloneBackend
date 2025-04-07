@@ -1,38 +1,70 @@
-import uuid
-import boto3
-from django.conf import settings
+from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from api.serializers.UserSerializer import UserSerializer
-from services.UploadService import UploadService
-from PIL import Image
-from io import BytesIO
 from services.AccountService import AccountService
 from models.user import User
-from django.shortcuts import get_object_or_404
-
-
 
 class AccountView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def post(self, request, action, id):
+        """
+        Ban hoặc mở khóa tài khoản người dùng (set is_ban).
+        """
+        try:
+            # Bắt đầu transaction
+            with transaction.atomic():
+                # Lấy đối tượng người dùng từ ID
+                user_to_update = get_object_or_404(User, id=id)
+
+                # Kiểm tra quyền của người dùng
+                if not request.user.role.name == "admin":
+                    return Response(
+                        {"message_code": "FORBIDDEN", "details": "You do not have permission to modify users."},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+
+                # Gọi service để ban hoặc unban tài khoản
+                message_code, message = AccountService.ban_or_unban_user(user_to_update, action)
+
+                return Response(
+                    {"message_code": message_code, "details": message, "user_id": user_to_update.id},
+                    status=status.HTTP_200_OK,
+                )
+
+        except Exception as e:
+            return Response(
+                {"message_code": "USER_UPDATE_FAILED", "details": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def get(self, request, *args, **kwargs):
+        """
+        Xử lý các hành động GET: lấy thông tin người dùng hiện tại hoặc lấy tất cả người dùng.
+        """
+        if request.path == '/api/account/':
+            # Lấy thông tin người dùng hiện tại
+            return self.get_user_info(request)
+        elif request.path == '/api/admin/accounts/':
+            # Lấy tất cả người dùng (chỉ dành cho admin)
+            return self.get_all_users(request)
+        else:
+            return Response(
+                {"message_code": "INVALID_ACTION", "details": "Invalid action specified."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def get_user_info(self, request):
         """
         Lấy thông tin người dùng hiện tại.
         """
         try:
             user = request.user
-            if not user.is_authenticated:
-                return Response(
-                    {"message_code": "USER_NOT_AUTHENTICATED", "details": "User is not authenticated."},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
-
-            user_data = UserSerializer(user).data
+            user_data = AccountService.get_user_info(user)
             return Response(user_data, status=status.HTTP_200_OK)
         except Exception as e:
             error_message = str(e)
@@ -40,6 +72,27 @@ class AccountView(APIView):
                 {"message_code": "USER_FETCH_FAILED", "details": error_message},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+    def get_all_users(self, request):
+        """
+        Lấy tất cả người dùng (chỉ dành cho admin).
+        """
+        try:
+            if not request.user.role.name == "admin":
+                return Response(
+                    {"message_code": "FORBIDDEN", "details": "You do not have permission to view all users."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+            user_data = AccountService.get_all_users()
+            return Response(user_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            error_message = str(e)
+            return Response(
+                {"message_code": "USER_FETCH_FAILED", "details": error_message},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
 
     def put(self, request):
         """
@@ -50,13 +103,16 @@ class AccountView(APIView):
         files = request.FILES
         action = data.get('action')
         image_path = user.image_path 
+
         try:
-            updated_user = AccountService.update_user(user, data, files, image_path,action)
-            updated_user_data = UserSerializer(updated_user).data
-            return Response(
-                {"message_code": "USER_UPDATE_SUCCESS", "user": updated_user_data},
-                status=status.HTTP_200_OK,
-            )
+            # Bắt đầu transaction
+            with transaction.atomic():
+                updated_user = AccountService.update_user(user, data, files, image_path, action)
+                updated_user_data = UserSerializer(updated_user).data
+                return Response(
+                    {"message_code": "USER_UPDATE_SUCCESS", "user": updated_user_data},
+                    status=status.HTTP_200_OK,
+                )
         except Exception as e:
             return Response(
                 {"message_code": "ERROR_OCCURRED", "details": str(e)},

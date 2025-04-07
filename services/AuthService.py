@@ -8,6 +8,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from models.user import User
+from models.artist_registration import ArtistRegistration
+from services.UploadService import UploadService
+from django.db import transaction
+from rest_framework.response import Response
+from rest_framework import status
 
 User = get_user_model()
 
@@ -17,7 +23,8 @@ class AuthService:
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
-        activation_url = f"{request.scheme}://{request.get_host()}{activation_link}"
+        # activation_url = f"{request.scheme}://{request.get_host()}{activation_link}"
+        activation_url = f"http://localhost:3000/activate/{uid}/{token}"
         subject = 'Activate your account'
         message = f'Hi {user.username}, please click the link to activate your account: {activation_url}'
         email_from = settings.EMAIL_HOST_USER
@@ -85,3 +92,86 @@ class AuthService:
             return False, "USER_NOT_FOUND"
         except Exception as e:
             return False, str(e)
+
+
+
+
+
+    @staticmethod
+    def register_artist(data, files):
+        """
+        Xử lý đăng ký nghệ sĩ, bao gồm việc upload ảnh và kiểm tra thông tin đầu vào.
+        """
+        artist_name = data.get("artistName")
+        phone = data.get("phone")
+        email = data.get("email")
+        bio = data.get("bio")
+        social_link = data.get("socialLink")
+
+        # Trích xuất files ảnh
+        proof_images = files.getlist("proofImages")
+        artist_images = files.getlist("artistImages")
+
+        # Validate dữ liệu đầu vào
+        if not all([artist_name, phone, email]):
+            return Response(
+                {"error": "Missing required fields"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Kiểm tra email và phone đã tồn tại
+        if User.objects.filter(email=email).exists():
+            return Response(
+                {"error_code": "EMAIL_ALREADY_REGISTERED"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if ArtistRegistration.objects.filter(email=email).exists():
+            return Response(
+                {"error_code": "EMAIL_ALREADY_REGISTERED"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if ArtistRegistration.objects.filter(phone_number=phone).exists():
+            return Response(
+                {"error_code": "PHONE_ALREADY_REGISTERED"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Bắt đầu transaction để bảo toàn dữ liệu
+        with transaction.atomic():
+            uploaded_proof_images = []
+            uploaded_artist_images = []
+
+            try:
+                # Upload proof images
+                for file in proof_images:
+                    uploaded_url = UploadService.upload_image_to_s3(file, file.name)
+                    uploaded_proof_images.append(uploaded_url)
+
+                # Upload artist images
+                for file in artist_images:
+                    uploaded_url = UploadService.upload_image_to_s3(file, file.name)
+                    uploaded_artist_images.append(uploaded_url)
+
+                # Tạo ArtistRegistrationRequest
+                artist_request = ArtistRegistration.objects.create(
+                    artist_name=artist_name,
+                    phone_number=phone,
+                    email=email,
+                    bio=bio,
+                    social_links=social_link,
+                    identity_proof=",".join(uploaded_proof_images) if uploaded_proof_images else "",
+                    artist_image=",".join(uploaded_artist_images) if uploaded_artist_images else ""
+                )
+
+                return Response(
+                    {"message": "Artist registration request successfully created"},
+                    status=status.HTTP_201_CREATED
+                )
+
+            except Exception as upload_error:
+                # Cleanup: Xóa các ảnh đã upload nếu có lỗi
+                for url in uploaded_proof_images + uploaded_artist_images:
+                    image_name = url.split("/")[-1]
+                    UploadService.delete_image_from_s3(image_name)
+                # Rollback toàn bộ giao dịch nếu xảy ra lỗi
+                raise Exception(f"Image upload failed: {str(upload_error)}")

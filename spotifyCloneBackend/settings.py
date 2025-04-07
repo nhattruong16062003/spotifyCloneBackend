@@ -228,11 +228,14 @@ REST_FRAMEWORK = {
 #     'BLACKLIST_AFTER_ROTATION': True,
 # }
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-}
+# Lấy JWT_SECRET_KEY từ biến môi trường
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "default-secret-key")  # Dự phòng nếu không có biến môi trường
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "SIGNING_KEY": JWT_SECRET_KEY,  # Sử dụng secret key từ biến môi trường
+}
 
 
 
