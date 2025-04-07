@@ -3,10 +3,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from api.serializers.UserSerializer import UserSerializer
 from services.AccountService import AccountService
 from models.user import User
+from rest_framework.decorators import permission_classes
+
 
 class AccountView(APIView):
     permission_classes = [IsAuthenticated]
@@ -42,15 +44,13 @@ class AccountView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    def get(self, request, *args, **kwargs):
-        """
-        Xử lý các hành động GET: lấy thông tin người dùng hiện tại hoặc lấy tất cả người dùng.
-        """
-        if request.path == '/api/account/':
-            # Lấy thông tin người dùng hiện tại
+
+    def get(self, request, profile_id=None):
+        if request.path.startswith('/api/public-profile/'):
+            return self.get_user_by_id(request, profile_id)
+        elif request.path == '/api/account/':
             return self.get_user_info(request)
         elif request.path == '/api/admin/accounts/':
-            # Lấy tất cả người dùng (chỉ dành cho admin)
             return self.get_all_users(request)
         else:
             return Response(
@@ -85,6 +85,22 @@ class AccountView(APIView):
                 )
 
             user_data = AccountService.get_all_users()
+            return Response(user_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            error_message = str(e)
+            return Response(
+                {"message_code": "USER_FETCH_FAILED", "details": error_message},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def get_user_by_id(self, request, profile_id):
+        """
+        Lấy thông tin người dùng theo ID
+        profile_id chính là id của account được truyền vào
+        """
+        try:
+            user = get_object_or_404(User, id=profile_id)  # Lấy user từ DB
+            user_data = UserSerializer(user).data  # Serialize dữ liệu
             return Response(user_data, status=status.HTTP_200_OK)
         except Exception as e:
             error_message = str(e)

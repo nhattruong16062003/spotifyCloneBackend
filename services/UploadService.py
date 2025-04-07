@@ -28,6 +28,7 @@ class UploadService:
         try:
             # Tải tệp lên S3 với tên tệp duy nhất
             s3.upload_fileobj(file, settings.MP3_AWS_STORAGE_BUCKET_NAME, unique_file_name)
+            print("ye",settings.MP3_AWS_CDN_URL)
             file_url = f"{settings.MP3_AWS_CDN_URL}/{unique_file_name}"
             return file_url
         except (NoCredentialsError, PartialCredentialsError) as e:
@@ -146,7 +147,7 @@ class UploadService:
             )
             
             # Trả về URL của ảnh
-            image_url = f"{settings.IMG_AWS_S3_CUSTOM_DOMAIN}/{unique_image_name}"
+            image_url = f"{settings.IMG_AWS_CDN_URL}/{unique_image_name}"
             return image_url
 
         except (NoCredentialsError, PartialCredentialsError) as e:
