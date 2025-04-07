@@ -8,6 +8,7 @@ from .views.SongPlayHistoryView import SongPlayHistoryView
 from .views.AccountView import AccountView
 from .views.PlaylistView import PlaylistView
 from .views.PlanView import PlanDetailView,PlanListView 
+from .views.ArtistRegistrationView import ArtistRegistrationView
 from .views.ArtistCollabView import FindArtistCollab
 
 urlpatterns = [
@@ -16,6 +17,7 @@ urlpatterns = [
     path('api/auth/<str:action>/', AuthView.as_view(), name='auth_action'),
     path('api/auth/activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
     path('api/auth/login/google/', GoogleLoginView.as_view(), name='google_login'),
+
     path('api/user/<int:user_id>/', UserView.as_view(), name='user'),
     path('api/song/<int:song_id>/', SongView.as_view(), name='update_delete_song'),
 
@@ -45,6 +47,14 @@ urlpatterns = [
 
     path('api/artist/song/', SongView.as_view(), name='add_song'), #upload
     path('api/artist/fetch-artist-collab/', FindArtistCollab.as_view(), name='get-artist-collab'), 
+
+    #ADMIN 
+    path('api/admin/artist-registration-requests/', ArtistRegistrationView.as_view(), name='artist-registration'),
+    path('api/admin/<str:action>/<int:id>/', ArtistRegistrationView.as_view(), name='artist-registration'),
+    path('api/admin/accounts/<str:action>/<int:id>/', AccountView.as_view(), name='account'),
+    path('api/admin/accounts/',AccountView.as_view(), name='account'),
+    
+    
 
 
 ]
