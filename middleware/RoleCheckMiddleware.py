@@ -14,6 +14,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
         "/api/trending/playlists/",
         "/api/trending/songs/",
         "/api/trending/albums/",
+        "/api/trending/artists/",
         "/api/auth/activate/",
         "/api/auth/login/google/",
         "/api/auth/password-reset/",

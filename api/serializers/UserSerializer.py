@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         #Serializer giúp chuyển đổi từ object đưới databse -> json để gửi lên client 
-        #SSerializer giúp chuyển đổi json từ client xuống backend để lưu vào database
+        #Serializer giúp chuyển đổi json từ client xuống backend để lưu vào database
         #Serializer giúp validate dữ liệu đầu vào 
 
         #Định nghĩa các trước của module user sẽ được sử dụng trong serializer, có nghĩa là sẽ chuyển đổi những trường nào. 
