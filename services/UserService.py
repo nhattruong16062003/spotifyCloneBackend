@@ -14,3 +14,11 @@ class UserService:
         return User.objects.filter(
             Q(name__icontains=search_query) & Q(role_id=2)
         ).order_by("name")[:5]
+    
+    @staticmethod
+    def get_users_by_role(role_id):
+        try:
+            users = User.objects.filter(role_id=role_id)
+            return users
+        except User.DoesNotExist:
+            return None
