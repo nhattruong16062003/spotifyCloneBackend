@@ -176,3 +176,10 @@ class PlaylistView(APIView):
                 return Response({"error": f"An error occurred: {str(e)}"}, status=500)
 
         return Response({"error": "Invalid endpoint"}, status=404)
+
+
+    def get_albums_by_id(self, request):
+        """
+        API lấy danh sách album của user
+        """
+        user_id = request.user.id

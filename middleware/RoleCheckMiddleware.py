@@ -36,7 +36,8 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/account/",
             "/api/artist/songs/",
             "/api/artist/albums/",
-            "/api/artist/song/"
+            "/api/artist/song/",
+            "/api/artist/create-album/",
         ),
         3: (  # USER
             "/api/user/",
@@ -51,6 +52,11 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/playlist/create/",
             "/api/playlist/add-song/",
             "/api/search/",
+            "/api/public-profile/",
+            "/api/public-profile/playlists/",
+            "/api/public-profile/albums/",
+            "/api/public-profile/popular-songs/",
+
         ),
     }
 
@@ -80,6 +86,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
 
         # Lấy role_id từ user
         user_role = getattr(request.user, "role_id", None)
+
 
         # Kiểm tra quyền truy cập theo role
         if not self._has_permission(request.path, user_role):
