@@ -233,7 +233,7 @@ REST_FRAMEWORK = {
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "default-secret-key")  # Dự phòng nếu không có biến môi trường
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "SIGNING_KEY": JWT_SECRET_KEY,  # Sử dụng secret key từ biến môi trường
 }
