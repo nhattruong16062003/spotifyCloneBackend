@@ -1,11 +1,13 @@
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
-from models.models import Song ,Playlist # Import các model
+from models.models import Song ,Playlist,User 
 # from models.models import Song, Playlist, Album  # Import các model
 from api.serializers.SongSerializer import SongSerializer  # Import serializers
 from api.serializers.PlaylistSerializer import PlaylistSerializer  # Import serializers
 from django.db.models import Count, Q
+from api.serializers.UserSerializer import UserSerializer  # Import serializer cho Artist
+
 
 
 class TrendingService:
@@ -77,4 +79,34 @@ class TrendingService:
             return PlaylistSerializer(trending_albums, many=True).data
         except Exception as e:
             print(f"Error fetching trending albums: {e}")
+            return []
+    
+    @staticmethod
+    def get_trending_artists(limit=10):
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+
+        try:
+            # Lấy danh sách nghệ sĩ có tổng số lượt nghe bài hát cao nhất trong 30 ngày qua
+            trending_artists = (
+                Song.objects
+                .filter(playbackhistory__played_at__gte=thirty_days_ago)  # Lọc các bài hát có lượt nghe trong 30 ngày
+                .values('user')  # Nhóm theo user (nghệ sĩ)
+                .annotate(total_plays=Count('playbackhistory'))  # Đếm tổng số lượt nghe
+                .order_by('-total_plays')  # Sắp xếp theo số lượt nghe giảm dần
+                [:limit]  # Giới hạn số lượng kết quả
+            )
+
+            # Lấy thông tin chi tiết của các nghệ sĩ từ danh sách user IDs
+            artist_ids = [artist['user'] for artist in trending_artists]
+            trending_artists = (
+                User.objects
+                .filter(id__in=artist_ids, role__name='artist', is_active=True)  # Chỉ lấy nghệ sĩ (role=artist) và đang hoạt động
+                .select_related('role')  # Tối ưu hóa truy vấn liên quan đến role
+            )
+
+            # Serialize dữ liệu
+            return UserSerializer(trending_artists, many=True).data
+
+        except Exception as e:
+            print(f"Error fetching trending artists: {str(e)}")
             return []
