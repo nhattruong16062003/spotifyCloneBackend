@@ -10,6 +10,7 @@ from .views.PlaylistView import PlaylistView
 from .views.PlanView import PlanDetailView,PlanListView 
 from .views.ArtistRegistrationView import ArtistRegistrationView
 from .views.ArtistCollabView import FindArtistCollab
+from .views.SearchView import SearchView
 from .views.PublicProfileView import PublicProfileView
 
 urlpatterns = [
@@ -40,6 +41,8 @@ urlpatterns = [
 
     path('api/plans/', PlanListView.as_view(), name='plans'), 
     path('api/plans/<int:plan_id>/', PlanDetailView.as_view(), name='plan_detail'),
+
+    path('api/search/', SearchView.as_view(), name='search'),
 
     #USER
     path('api/public-profile/<int:profile_id>/', AccountView.as_view(), name='public_profile'),

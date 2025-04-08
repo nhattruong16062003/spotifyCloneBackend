@@ -17,6 +17,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
         "/api/auth/activate/",
         "/api/auth/login/google/",
         "/api/auth/password-reset/",
+        "/api/search/",
     )
 
     # Quyền truy cập theo role
@@ -50,10 +51,12 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/playlist/user/",
             "/api/playlist/create/",
             "/api/playlist/add-song/",
+            "/api/search/",
             "/api/public-profile/",
             "/api/public-profile/playlists/",
             "/api/public-profile/albums/",
             "/api/public-profile/popular-songs/",
+
         ),
     }
 
