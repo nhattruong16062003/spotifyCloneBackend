@@ -65,9 +65,6 @@ urlpatterns = [
     path('api/admin/<str:action>/<int:id>/', ArtistRegistrationView.as_view(), name='artist-registration'),
     path('api/admin/accounts/<str:action>/<int:id>/', AccountView.as_view(), name='account'),
     path('api/admin/accounts/',AccountView.as_view(), name='account'),
-    
-    
-
 
 ]
 
