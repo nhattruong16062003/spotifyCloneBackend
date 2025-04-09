@@ -14,22 +14,40 @@ from services.UploadService import UploadService
 from django.db import transaction
 from rest_framework.response import Response
 from rest_framework import status
+from services.EmailService import send_custom_email
 
 User = get_user_model()
 
 class AuthService:
+    # @staticmethod
+    # def send_activation_email(user, request):
+    #     token = default_token_generator.make_token(user)
+    #     uid = urlsafe_base64_encode(force_bytes(user.pk))
+    #     activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
+    #     # activation_url = f"{request.scheme}://{request.get_host()}{activation_link}"
+    #     activation_url = f"http://localhost:3000/activate/{uid}/{token}"
+    #     subject = 'Activate your account'
+    #     message = f'Hi {user.username}, please click the link to activate your account: {activation_url}'
+    #     email_from = settings.EMAIL_HOST_USER
+    #     recipient_list = [user.email]
+    #     send_mail(subject, message, email_from, recipient_list)
+
     @staticmethod
     def send_activation_email(user, request):
+        # Tạo token và UID cho link kích hoạt
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
-        # activation_url = f"{request.scheme}://{request.get_host()}{activation_link}"
-        activation_url = f"http://localhost:3000/activate/{uid}/{token}"
-        subject = 'Activate your account'
-        message = f'Hi {user.username}, please click the link to activate your account: {activation_url}'
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = [user.email]
-        send_mail(subject, message, email_from, recipient_list)
+        activation_url = f"http://localhost:3000/activate/{uid}/{token}"  # URL frontend
+
+        # Gửi email bằng send_custom_email từ EmailService
+        send_custom_email(
+            subject="Kích hoạt tài khoản của bạn",
+            username=user.username,
+            message="Vui lòng nhấn vào liên kết bên dưới để kích hoạt tài khoản của bạn.",
+            link=activation_url,
+            recipient_email=user.email
+        )
 
     @staticmethod
     def authenticate_user(email, password):
@@ -37,6 +55,8 @@ class AuthService:
             user = User.objects.get(email=email)
             if not user.is_active:
                 return None, "ACCOUNT_NOT_ACTIVATED"
+            elif user.is_ban: 
+                return None, "ACCOUNT_WAS_BAN"
         except User.DoesNotExist:
             return None, "INVALID_CREDENTIALS"
 
@@ -175,3 +195,4 @@ class AuthService:
                     UploadService.delete_image_from_s3(image_name)
                 # Rollback toàn bộ giao dịch nếu xảy ra lỗi
                 raise Exception(f"Image upload failed: {str(upload_error)}")
+        

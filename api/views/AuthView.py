@@ -124,26 +124,59 @@ class AuthView(APIView):
                     "details": str(e)
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # def login(self, request):
+    #     if request.user.is_authenticated:
+    #         return Response({"message": "Already logged in"}, status=status.HTTP_200_OK)
+        
+    #     email = request.data.get('email')
+    #     password = request.data.get('password')
+
+    #     user, error_code = AuthService.authenticate_user(email, password)
+    #     if error_code:
+    #         return Response({"error_code": error_code}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     # login(request, user)
+    #     # Generate JWT tokens
+    #     refresh = RefreshToken.for_user(user)
+    #     return Response({
+    #         "access": str(refresh.access_token),
+    #         "refresh": str(refresh),
+    #         "role":user.role.id    #nếu muốn trả về tên role:  str(user.role)
+    #     }, status=status.HTTP_200_OK)
+
     def login(self, request):
+        # Kiểm tra nếu user đã đăng nhập
         if request.user.is_authenticated:
             return Response({"message": "Already logged in"}, status=status.HTTP_200_OK)
         
+        # Lấy email và password từ request
         email = request.data.get('email')
         password = request.data.get('password')
 
+        # Xác thực user thông qua AuthService
         user, error_code = AuthService.authenticate_user(email, password)
         if error_code:
             return Response({"error_code": error_code}, status=status.HTTP_400_BAD_REQUEST)
 
-        # login(request, user)
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
+
+        # Kiểm tra trạng thái premium
+        active_premium = user.get_active_premium()
+        is_premium = bool(active_premium)
+        premium_plan = active_premium.plan.name if active_premium else None
+        premium_end_date = active_premium.end_date if active_premium else None
+
+        # Trả về response với thông tin token và trạng thái premium
         return Response({
             "access": str(refresh.access_token),
             "refresh": str(refresh),
-            "role":user.role.id    #nếu muốn trả về tên role:  str(user.role)
+            "role": user.role.id,  # Nếu muốn trả về tên role: str(user.role)
+            "is_premium": is_premium,  # Trạng thái premium (True/False)
+            "premium_plan": premium_plan,  # Tên gói premium (nếu có)
+            "premium_end_date": premium_end_date  # Ngày hết hạn (nếu có)
         }, status=status.HTTP_200_OK)
-        
+            
         
     def refresh_token(self, request):
         refresh_token = request.data.get("refresh")  
@@ -230,10 +263,21 @@ class GoogleLoginView(APIView):
 
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
+
+
+            # Kiểm tra trạng thái premium
+            active_premium = user.get_active_premium()
+            is_premium = bool(active_premium)
+            premium_plan = active_premium.plan.name if active_premium else None
+            premium_end_date = active_premium.end_date if active_premium else None
+
             return Response({
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
-                "role":user.role.id    #nếu muốn trả về tên role:  str(user.role)
+                "role":user.role.id,   #nếu muốn trả về tên role:  str(user.role)
+                "is_premium": is_premium,  # Trạng thái premium (True/False)
+                "premium_plan": premium_plan,  # Tên gói premium (nếu có)
+                "premium_end_date": premium_end_date  # Ngày hết hạn (nếu có)
             }, status=status.HTTP_200_OK)
         except Exception as e:
             # Log the error for debugging purposes
