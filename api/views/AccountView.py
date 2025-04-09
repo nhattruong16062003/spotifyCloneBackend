@@ -11,7 +11,6 @@ from rest_framework.decorators import permission_classes
 
 
 class AccountView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def post(self, request, action, id):
         """
