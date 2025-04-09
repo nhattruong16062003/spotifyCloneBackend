@@ -14,9 +14,11 @@ class RoleCheckMiddleware(MiddlewareMixin):
         "/api/trending/playlists/",
         "/api/trending/songs/",
         "/api/trending/albums/",
+        "/api/trending/artists/",
         "/api/auth/activate/",
         "/api/auth/login/google/",
         "/api/auth/password-reset/",
+        "/api/search/",
     )
 
     # Quyền truy cập theo role
@@ -50,10 +52,12 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/playlist/user/",
             "/api/playlist/create/",
             "/api/playlist/add-song/",
+            "/api/search/",
             "/api/public-profile/",
             "/api/public-profile/playlists/",
             "/api/public-profile/albums/",
             "/api/public-profile/popular-songs/",
+
         ),
     }
 

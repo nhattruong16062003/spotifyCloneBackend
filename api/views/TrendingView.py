@@ -18,6 +18,9 @@ class TrendingView(APIView):
             elif 'album' in path:
                 data = TrendingService.get_trending_albums(limit=10)
                 key = 'trending_albums'
+            elif 'artists' in path:
+                data = TrendingService.get_trending_artists(limit=10)
+                key = 'trending_artists'
             else:
                 return Response({"error": "Invalid trending type"}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -10,6 +10,7 @@ from .views.PlaylistView import PlaylistView
 from .views.PlanView import PlanDetailView,PlanListView 
 from .views.ArtistRegistrationView import ArtistRegistrationView
 from .views.ArtistCollabView import FindArtistCollab
+from .views.SearchView import SearchView
 from .views.PublicProfileView import PublicProfileView
 
 urlpatterns = [
@@ -26,6 +27,7 @@ urlpatterns = [
     path('api/trending/songs/', TrendingView.as_view(), name='trending_songs'),
     path('api/trending/playlists/', TrendingView.as_view(), name='trending_playlists'),
     path('api/trending/albums/', TrendingView.as_view(), name='trending_albums'),
+    path('api/trending/artists/', TrendingView.as_view(), name='trending_artists'),
 
     path('api/song/previous/<int:song_id>/', SongView.as_view(), name='previous_song'),
     path('api/song/next/<int:song_id>/', SongView.as_view(), name='next_song'),
@@ -40,6 +42,8 @@ urlpatterns = [
 
     path('api/plans/', PlanListView.as_view(), name='plans'), 
     path('api/plans/<int:plan_id>/', PlanDetailView.as_view(), name='plan_detail'),
+
+    path('api/search/', SearchView.as_view(), name='search'),
 
     #USER
     path('api/public-profile/<int:profile_id>/', AccountView.as_view(), name='public_profile'),

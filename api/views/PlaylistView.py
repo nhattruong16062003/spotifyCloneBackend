@@ -168,7 +168,7 @@ class PlaylistView(APIView):
                         "message": "Album created successfully",
                         "album_id": album["id"]
                     }, status=201)
-
+ 
             except Exception as e:
                 # Nếu có lỗi, transaction sẽ rollback tự động
                 if image_url:
