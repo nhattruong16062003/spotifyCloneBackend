@@ -136,7 +136,8 @@ DATABASES = {
         'NAME': config('DATABASE_NAME', default='spotify_db'),
         'USER': config('DATABASE_USER', default='user'),
         'PASSWORD': config('DATABASE_PASSWORD', default='12345'),
-        'HOST': config('DATABASE_HOST', default='db'),
+        # 'HOST': config('DATABASE_HOST', default='db'), #dùng cho production
+        'HOST': '127.0.0.1',  # 👈 Đổi từ 'db' thành '127.0.0.1'
         'PORT': config('DATABASE_PORT', default='3306'),
     }
 }
