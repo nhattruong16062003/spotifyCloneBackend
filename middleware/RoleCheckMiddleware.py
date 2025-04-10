@@ -60,6 +60,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/public-profile/albums/",
             "/api/public-profile/popular-songs/",
             "/api/cash-payment/",
+            "/api/premium/update/order-playlist/",
         ),
     }
 

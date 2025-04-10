@@ -6,9 +6,7 @@ from django.utils import timezone
 class PremiumCheckMiddleware(MiddlewareMixin):
     # Endpoint CHỈ DÀNH CHO PREMIUM
     PREMIUM_REQUIRED_ENDPOINTS = (
-        "/api/premium/",
-        "/api/song/high-quality/",
-        "/api/playlist/premium-only/",
+        "/api/premium/update/order-playlist/",
     )
 
     # Endpoint CHỈ DÀNH CHO NON-PREMIUM
