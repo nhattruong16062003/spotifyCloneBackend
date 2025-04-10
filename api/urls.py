@@ -12,6 +12,7 @@ from .views.ArtistRegistrationView import ArtistRegistrationView
 from .views.ArtistCollabView import FindArtistCollab
 from .views.SearchView import SearchView
 from .views.PublicProfileView import PublicProfileView
+from .views.PlaylistSongView import PlaylistSongView
 
 urlpatterns = [
     #PUBLIC
@@ -50,6 +51,9 @@ urlpatterns = [
     path('api/public-profile/playlists/<int:profile_id>/', PublicProfileView.as_view(), name='public_playlists'),
     path('api/public-profile/albums/<int:profile_id>/', PublicProfileView.as_view(), name='public_albums'),
     path('api/public-profile/popular-songs/<int:profile_id>/',PublicProfileView.as_view(), name='popular_song'),
+
+    #PREMIUM
+    path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),
 
     # ARTIST
     path('api/artist/songs/', SongView.as_view(), name='artist_song'),

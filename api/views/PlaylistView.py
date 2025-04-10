@@ -2,7 +2,7 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from models.models import Song, Playlist, PlaylistSong
+from models.models import Song, Playlist, PlaylistSong,User
 from api.serializers.PlaylistSerializer import PlaylistSerializer
 from api.serializers.SongSerializer import SongSerializer  # Import SongSerializer
 from services.PlaylistService import PlaylistService
@@ -24,6 +24,16 @@ class PlaylistView(APIView):
             try:
                 # Lấy playlist theo ID
                 playlist = Playlist.objects.get(id=playlist_id)
+
+                isOwner = False
+
+                if request.user.is_authenticated:
+                    active_premium = request.user.get_active_premium()
+                    is_premium = bool(active_premium)
+                    user_role=request.user.role_id
+                    if user_role == 3 and playlist.user_id == user_id and is_premium:
+                        isOwner = True
+                print(isOwner)
                 
                 # Serialize thông tin playlist
                 playlist_serializer = PlaylistSerializer(playlist)
@@ -41,7 +51,8 @@ class PlaylistView(APIView):
                 # Trả về cả thông tin playlist và danh sách bài hát
                 return Response({
                     "playlist": playlist_serializer.data,
-                    "songs": songs_data
+                    "songs": songs_data,
+                    "isOwner": isOwner
                 }, status=status.HTTP_200_OK)
             except Playlist.DoesNotExist:
                 return Response({"error": "Playlist not found"}, status=status.HTTP_404_NOT_FOUND)
