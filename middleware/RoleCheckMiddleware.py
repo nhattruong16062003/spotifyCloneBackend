@@ -11,6 +11,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
         "/api/auth/register/",
         "/api/auth/register-artist/",
         "/api/auth/refresh/",
+        "/api/auth/resend-active-link/",
         "/api/trending/playlists/",
         "/api/trending/songs/",
         "/api/trending/albums/",
@@ -31,6 +32,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/admin/<str:action>/<int:id>/",
             "/api/admin/accounts/",
             "/api/admin/accounts/<str:action>/<int:id>/",
+            "/api/account/",
 
           
         ),
@@ -96,7 +98,6 @@ class RoleCheckMiddleware(MiddlewareMixin):
         if not self._has_permission(request.path, user_role):
             print("role ",{user_role},"request path ",{request.path},"khong duoc truy cap")
             return JsonResponse({"error": "Forbidden"}, status=403)
-
         return None
 
     def _is_public_endpoint(self, path):

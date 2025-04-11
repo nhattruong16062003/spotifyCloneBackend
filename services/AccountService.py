@@ -9,10 +9,11 @@ from api.serializers.UserSerializer import UserSerializer
 
 class AccountService:
     @staticmethod
-    def update_user(user, data, files,image_path,action):
+    def update_user(user, data, files,image_path):
         """
         Cập nhật thông tin người dùng.
         """
+        action = data.get('action')
         if(action == "change_image"):
             #Nếu trước đó người dùng có anh thì phải xóa trên aws
             if image_path is not None:

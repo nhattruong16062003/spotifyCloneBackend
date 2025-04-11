@@ -34,7 +34,7 @@ urlpatterns = [
     path('api/song/next/<int:song_id>/', SongView.as_view(), name='next_song'),
 
     path('api/history/update/', SongPlayHistoryView.as_view(), name='update_play_history'),
-    path('api/account/', AccountView.as_view(), name='account'),
+    path('api/account/<str:action>/', AccountView.as_view(), name='account'),
     path('api/playlists/songs/<int:playlist_id>/', PlaylistView.as_view(), name='playlist-songs'),
 
     path('api/playlist/user/<int:song_id>/', PlaylistView.as_view(), name='get_playlists_from_user'),
@@ -65,10 +65,13 @@ urlpatterns = [
     path('api/artist/fetch-artist-collab/', FindArtistCollab.as_view(), name='get-artist-collab'), 
 
     #ADMIN 
-    path('api/admin/artist-registration-requests/', ArtistRegistrationView.as_view(), name='artist-registration'),
-    path('api/admin/<str:action>/<int:id>/', ArtistRegistrationView.as_view(), name='artist-registration'),
+    path('api/admin/artist-registration-requests/<int:page>/', ArtistRegistrationView.as_view(), name='artist-registration'),
+    path('api/admin/artist-registration/<str:action>/<int:id>/', ArtistRegistrationView.as_view(), name='artist-registration'),
     path('api/admin/accounts/<str:action>/<int:id>/', AccountView.as_view(), name='account'),
-    path('api/admin/accounts/',AccountView.as_view(), name='account'),
+
+    path('api/admin/accounts/<int:page>/',AccountView.as_view(), name='account'),
+
+
 
 ]
 
