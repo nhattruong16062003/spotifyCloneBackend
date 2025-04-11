@@ -16,8 +16,12 @@ class PlaylistView(APIView):
     def get(self, request, song_id=None, playlist_id=None):
         user_id = request.user.id  # Lấy user_id
         """API lấy danh sách playlist của user nhưng chưa chứa song_id"""
-        if request.path.endswith(f"/api/playlist/user/{song_id}/"):  # Kiểm tra URL
-            playlists = Playlist.objects.filter(user_id=user_id).exclude(playlistsong__song_id=song_id)
+        if request.path.startswith(f"/api/playlist/user/"):  # Kiểm tra URL
+            print("oke")
+            # playlists = Playlist.objects.filter(user_id=user_id).exclude(playlistsong__song_id=song_id)
+            playlists = Playlist.objects.filter(user_id = user_id)
+            if song_id is not None:
+                playlists = playlists.exclude(playlistsong__song_id=song_id)
             serializer = PlaylistSerializer(playlists, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif request.path.endswith(f"/api/playlists/songs/{playlist_id}/"):

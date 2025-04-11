@@ -33,6 +33,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/admin/accounts/",
             "/api/admin/accounts/<str:action>/<int:id>/",
             "/api/account/",
+            "/api/admin/plans/",
 
           
         ),

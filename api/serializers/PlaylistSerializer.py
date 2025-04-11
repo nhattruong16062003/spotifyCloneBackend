@@ -6,5 +6,5 @@ class PlaylistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Playlist
-        fields = ['id', 'name', 'image_path', 'username']  # Thêm username vào fields
+        fields = ['id', 'name', 'image_path', 'username','description']  # Thêm username vào fields
 
