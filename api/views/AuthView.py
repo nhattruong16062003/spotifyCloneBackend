@@ -141,7 +141,7 @@ class AuthView(APIView):
 
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
-
+ 
         # Kiểm tra trạng thái premium
         active_premium = user.get_active_premium()
         is_premium = bool(active_premium)

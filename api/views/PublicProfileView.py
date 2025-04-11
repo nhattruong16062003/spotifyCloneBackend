@@ -14,7 +14,7 @@ from django.db import models
 
 
 class PublicProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     def get(self, request, profile_id):
         if(request.path.startswith('/api/public-profile/albums/')):
             return self.get_albums_or_playlists_by_id(request, profile_id)
@@ -22,7 +22,6 @@ class PublicProfileView(APIView):
             return self.get_albums_or_playlists_by_id(request, profile_id)
         if(request.path.startswith('/api/public-profile/popular-songs/')):
             return self.get_popular_songs_by_id(request, profile_id)
-
 
     def get_albums_or_playlists_by_id(self, request, profile_id):
         """
@@ -38,10 +37,6 @@ class PublicProfileView(APIView):
             return Response(list(playlist_data), status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-
-   
-
-
 
     def get_popular_songs_by_id(self, request, profile_id):
         """

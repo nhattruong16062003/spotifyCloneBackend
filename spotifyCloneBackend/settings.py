@@ -3,6 +3,12 @@ import os
 import pymysql
 from datetime import timedelta
 from dotenv import load_dotenv
+from pathlib import Path
+from decouple import config
+
+pymysql.install_as_MySQLdb()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()  # Load biến môi trường từ file .env
 
@@ -96,6 +102,9 @@ MIDDLEWARE = [
 
     # Thêm Middleware kiểm tra quyền truy cập theo Role
     'middleware.RoleCheckMiddleware.RoleCheckMiddleware',
+
+    'middleware.PremiumCheckMiddleware.PremiumCheckMiddleware',
+
 ]
 
 
@@ -120,16 +129,19 @@ TEMPLATES = [
     },
 ]
 
+# Cấu hình cơ sở dữ liệu
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'spotify_db',
-        'USER': 'user',
-        'PASSWORD': '12345',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': config('DATABASE_NAME', default='spotify_db'),
+        'USER': config('DATABASE_USER', default='user'),
+        'PASSWORD': config('DATABASE_PASSWORD', default='12345'),
+        # 'HOST': config('DATABASE_HOST', default='db'), #dùng cho production
+        'HOST': '127.0.0.1',  # 👈 Đổi từ 'db' thành '127.0.0.1'
+        'PORT': config('DATABASE_PORT', default='3306'),
     }
 }
+
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -220,8 +232,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # Tự động kiểm tra JWT
     ),
 }
-
-
 
 # Simple JWT settings
 # SIMPLE_JWT = {
