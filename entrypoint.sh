@@ -4,5 +4,8 @@ set -e
 echo "Running migrations..."
 python manage.py migrate
 
-echo "Starting Gunicorn server..."
-exec gunicorn spotifyCloneBackend.wsgi:application --bind 0.0.0.0:8000 --workers=1
+echo "Starting Uvicorn server with Gunicorn and multiple workers..."
+exec gunicorn spotifyCloneBackend.asgi:application \
+    --bind 0.0.0.0:8000 \
+    --workers 1 \
+    --worker-class uvicorn.workers.UvicornWorker
