@@ -248,3 +248,18 @@ SIMPLE_JWT = {
     "SIGNING_KEY": JWT_SECRET_KEY,  # Sử dụng secret key từ biến môi trường
 }
 
+ASGI_APPLICATION = 'spotifyCloneBackend.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        #DELOY MỎ CMT KHÔNG XÓA CODE NÀY
+        # "CONFIG": {
+        #     "hosts": [("redis", 6379)],
+        # }, 
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # ← Sửa ở đây
+        },
+    },
+}
+

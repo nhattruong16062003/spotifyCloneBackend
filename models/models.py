@@ -11,3 +11,7 @@ from .premium_plan import PremiumPlan
 from .premium_subscription import PremiumSubscription
 from .artist_registration import ArtistRegistration
 from .artist_collab import ArtistCollab
+from .conversation import Conversation
+from .message import Message
+
+
