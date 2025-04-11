@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate, get_user_model
-from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -19,19 +18,6 @@ from services.EmailService import send_custom_email
 User = get_user_model()
 
 class AuthService:
-    # @staticmethod
-    # def send_activation_email(user, request):
-    #     token = default_token_generator.make_token(user)
-    #     uid = urlsafe_base64_encode(force_bytes(user.pk))
-    #     activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
-    #     # activation_url = f"{request.scheme}://{request.get_host()}{activation_link}"
-    #     activation_url = f"http://localhost:3000/activate/{uid}/{token}"
-    #     subject = 'Activate your account'
-    #     message = f'Hi {user.username}, please click the link to activate your account: {activation_url}'
-    #     email_from = settings.EMAIL_HOST_USER
-    #     recipient_list = [user.email]
-    #     send_mail(subject, message, email_from, recipient_list)
-
     @staticmethod
     def send_activation_email(user, request):
         # Tạo token và UID cho link kích hoạt
@@ -100,12 +86,13 @@ class AuthService:
             new_password = get_random_string(length=8)
             user.set_password(new_password)
             user.save()
-            send_mail(
-                'Password Reset',
-                f'Your new password is: {new_password}',
-                settings.EMAIL_HOST_USER,
-                [email],
-                fail_silently=False,
+            # Gửi email chứa mật khẩu mới bằng send_custom_email từ EmailService
+            send_custom_email(
+                subject="Mật khẩu mới của bạn",
+                username=user.name,
+                message=f"Mật khẩu mới của bạn là: {new_password}\nVui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.",
+                link=None,  # Không cần liên kết
+                recipient_email=user.email
             )
             return True, None
         except User.DoesNotExist:

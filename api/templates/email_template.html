@@ -1,44 +1,141 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject }}</title>
     <style>
+        /* Reset mặc định */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #191414;
+            /* Màu nền đen của Spotify */
+            line-height: 1.6;
+            color: #FFFFFF;
+            /* Màu chữ trắng */
         }
 
         .container {
             max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            background-color: #212121;
+            /* Màu xám đậm cho container */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .header {
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 10px;
+            background: linear-gradient(135deg, #1DB954, #168038);
+            /* Gradient xanh lá của Spotify */
+            padding: 20px;
             text-align: center;
-            border-radius: 5px 5px 0 0;
+            position: relative;
+        }
+
+        .header img.logo {
+            max-width: 120px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            color: #FFFFFF;
+            text-transform: uppercase;
         }
 
         .content {
-            padding: 20px;
+            padding: 30px;
             text-align: center;
+            background-color: #212121;
+            /* Nền xám đậm */
+        }
+
+        .greeting {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+        }
+
+        .message {
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: #B3B3B3;
+            /* Màu xám nhạt cho nội dung */
         }
 
         .button {
             display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #ffffff;
+            padding: 12px 30px;
+            background-color: #1DB954;
+            /* Màu xanh lá của Spotify */
+            color: #FFFFFF;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #1ed760;
+            /* Sáng hơn khi hover */
+        }
+
+        .signature {
+            font-size: 14px;
+            color: #B3B3B3;
+            margin-top: 30px;
+        }
+
+        .footer {
+            background-color: #181818;
+            /* Màu footer tối hơn */
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #B3B3B3;
+        }
+
+        .footer a {
+            color: #1DB954;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100%;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .header img.logo {
+                max-width: 100px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -46,15 +143,23 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>{{ subject }}</h2>
+            <!-- Thêm logo (có thể thay bằng logo của bạn) -->
+            <img src="https://marketplace.canva.com/EAE78mYI9ug/5/0/1600w/canva-black-and-white-music-studio-logo-Gc2_olDt0BM.jpg"
+                alt="Spotify Logo" class="logo">
+            <h1>{{ subject }}</h1>
         </div>
         <div class="content">
-            <p>Xin chào {{ username }},</p>
-            <p>{{ message }}</p>
+            <p class="greeting">Xin chào <strong>{{ username }}</strong>,</p>
+            <p class="message">{{ message }}</p>
             {% if link %}
             <a href="{{ link }}" class="button">Nhấn vào đây</a>
             {% endif %}
-            <p>Trân trọng,<br>Đội ngũ hỗ trợ</p>
+            <p class="signature">Trân trọng,<br>Đội ngũ Spotify Clone</p>
+        </div>
+        <div class="footer">
+            <p>© 2025 Spotify Clone. Mọi quyền được bảo lưu.</p>
+            <p><a href="https://yourwebsite.com">Truy cập website</a> | <a href="mailto:support@yourwebsite.com">Liên hệ
+                    hỗ trợ</a></p>
         </div>
     </div>
 </body>

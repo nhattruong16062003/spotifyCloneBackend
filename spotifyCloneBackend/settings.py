@@ -238,10 +238,3 @@ SIMPLE_JWT = {
     "SIGNING_KEY": JWT_SECRET_KEY,  # Sử dụng secret key từ biến môi trường
 }
 
-
-
-#Cấu hình static files trong Django để có thể sử dụng 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-
-

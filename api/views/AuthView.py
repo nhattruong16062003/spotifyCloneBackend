@@ -4,7 +4,6 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.contrib.auth import authenticate, login, get_user_model
-from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -44,6 +43,8 @@ class AuthView(APIView):
             return self.password_reset(request)
         elif action == 'register-artist':
             return self.register_artist(request)
+        elif action == 'resend-active-link':
+            return self.resend_active_link(request)
         else:
             return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -124,26 +125,6 @@ class AuthView(APIView):
                     "details": str(e)
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # def login(self, request):
-    #     if request.user.is_authenticated:
-    #         return Response({"message": "Already logged in"}, status=status.HTTP_200_OK)
-        
-    #     email = request.data.get('email')
-    #     password = request.data.get('password')
-
-    #     user, error_code = AuthService.authenticate_user(email, password)
-    #     if error_code:
-    #         return Response({"error_code": error_code}, status=status.HTTP_400_BAD_REQUEST)
-
-    #     # login(request, user)
-    #     # Generate JWT tokens
-    #     refresh = RefreshToken.for_user(user)
-    #     return Response({
-    #         "access": str(refresh.access_token),
-    #         "refresh": str(refresh),
-    #         "role":user.role.id    #nếu muốn trả về tên role:  str(user.role)
-    #     }, status=status.HTTP_200_OK)
-
     def login(self, request):
         # Kiểm tra nếu user đã đăng nhập
         if request.user.is_authenticated:
@@ -201,11 +182,25 @@ class AuthView(APIView):
             return Response({"error": error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(status=status.HTTP_200_OK)
 
+    def resend_active_link(self, request):
+        try:
+            email = request.data.get('email')
+            user = User.objects.get(email=email)
+            if user.is_active == 1:
+                return Response({"error": "ACCOUNT_ACTIVED"}, status=status.HTTP_400_BAD_REQUEST)
+            AuthService.send_activation_email(user, request)
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class ActivateAccountView(APIView):
-    def get(self, request, uidb64, token):
+    def patch(self, request, uidb64, token):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
+            if user.is_active == 1:
+                return Response({"message": "Account activated successfully"}, status=status.HTTP_200_OK)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
