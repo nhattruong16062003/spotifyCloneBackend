@@ -19,6 +19,7 @@ from .views.ConversationView import ConversationView
 from django.urls import re_path
 from .views.Consumers import Consumers
 from .views.MessageListView import MessageListView
+from .views.StreamVideoView import StreamVideoView
 
 
 urlpatterns = [
@@ -63,7 +64,8 @@ urlpatterns = [
     path('messages/<int:other_user_id>/', MessageListView.as_view(), name='message-list'),
     path('api/conversations/user/', ConversationView.as_view(), name='conversations'),
     path('api/conversations/mark-read/<int:conversation_id>/', ConversationView.as_view(), name='conversations'),
-    
+    path('api/video/', StreamVideoView.as_view(), name='stream-video'),
+  
     #PREMIUM
     path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),
 
