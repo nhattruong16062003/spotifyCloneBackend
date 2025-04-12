@@ -13,6 +13,8 @@ from .views.ArtistCollabView import FindArtistCollab
 from .views.SearchView import SearchView
 from .views.PublicProfileView import PublicProfileView
 from .views.PlaylistSongView import PlaylistSongView
+from .views.PremiumPlanView import PremiumPlanView
+from rest_framework.routers import DefaultRouter
 #chat
 from django.urls import re_path
 from .views.Consumers import Consumers
@@ -42,6 +44,7 @@ urlpatterns = [
     path('api/account/<str:action>/', AccountView.as_view(), name='account'),
     path('api/playlists/songs/<int:playlist_id>/', PlaylistView.as_view(), name='playlist-songs'),
 
+    path('api/playlist/user/', PlaylistView.as_view(), name='get_playlists_from_user'),
     path('api/playlist/user/<int:song_id>/', PlaylistView.as_view(), name='get_playlists_from_user'),
     path('api/playlist/add-song/', PlaylistView.as_view(), name='add_song_to_playlist'),
     path('api/playlist/create/', PlaylistView.as_view(), name='create_playlist'), 
@@ -77,6 +80,8 @@ urlpatterns = [
     path('api/admin/accounts/<str:action>/<int:id>/', AccountView.as_view(), name='account'),
 
     path('api/admin/accounts/<int:page>/',AccountView.as_view(), name='account'),
+    path('api/admin/plans/',PremiumPlanView.as_view(), name='plans'),
+    path('api/admin/plans/<int:id>/',PremiumPlanView.as_view(), name='plans'),
 
 ]
 websocket_urlpatterns = [
