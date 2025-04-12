@@ -26,6 +26,8 @@ class RoleCheckMiddleware(MiddlewareMixin):
         #Để ở đây để không dùng middleware này kiểm tra url của chat mà dùng một middleware khác
         "/ws/chat/testroom/",
         "/api/messages/",
+
+        "/api/video/",
     )
 
     # Quyền truy cập theo role
