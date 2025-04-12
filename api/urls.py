@@ -19,6 +19,7 @@ from rest_framework.routers import DefaultRouter
 from django.urls import re_path
 from .views.Consumers import Consumers
 from .views.MessageListView import MessageListView
+from .views.StreamVideoView import StreamVideoView
 
 
 urlpatterns = [
@@ -61,6 +62,8 @@ urlpatterns = [
     path('api/public-profile/popular-songs/<int:profile_id>/',PublicProfileView.as_view(), name='popular_song'),
 
     path('messages/<int:other_user_id>/', MessageListView.as_view(), name='message-list'),
+
+    path('api/video/', StreamVideoView.as_view(), name='stream-video'),
     
     #PREMIUM
     path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),

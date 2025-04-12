@@ -135,3 +135,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Google service account key
+zmusic-456605-3f7931d3cb29.json
