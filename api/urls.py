@@ -15,6 +15,11 @@ from .views.PublicProfileView import PublicProfileView
 from .views.PlaylistSongView import PlaylistSongView
 from .views.PremiumPlanView import PremiumPlanView
 from rest_framework.routers import DefaultRouter
+#chat
+from django.urls import re_path
+from .views.Consumers import Consumers
+from .views.MessageListView import MessageListView
+
 
 urlpatterns = [
     #PUBLIC
@@ -55,6 +60,8 @@ urlpatterns = [
     path('api/public-profile/albums/<int:profile_id>/', PublicProfileView.as_view(), name='public_albums'),
     path('api/public-profile/popular-songs/<int:profile_id>/',PublicProfileView.as_view(), name='popular_song'),
 
+    path('messages/<int:other_user_id>/', MessageListView.as_view(), name='message-list'),
+    
     #PREMIUM
     path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),
 
@@ -76,8 +83,9 @@ urlpatterns = [
     path('api/admin/plans/',PremiumPlanView.as_view(), name='plans'),
     path('api/admin/plans/<int:id>/',PremiumPlanView.as_view(), name='plans'),
 
-   
-
+]
+websocket_urlpatterns = [
+    re_path(r'ws/chat/$', Consumers.as_asgi()),
 ]
 
 
