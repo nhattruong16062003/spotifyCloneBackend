@@ -20,6 +20,7 @@ from django.urls import re_path
 from .views.Consumers import Consumers
 from .views.MessageListView import MessageListView
 from .views.StreamVideoView import StreamVideoView
+from .views.VideoView import VideoView
 
 
 urlpatterns = [
@@ -77,7 +78,9 @@ urlpatterns = [
 
     path('api/artist/song/', SongView.as_view(), name='add_song'), #upload
     path('api/artist/fetch-artist-collab/', FindArtistCollab.as_view(), name='get-artist-collab'), 
-
+    path('api/artist/video/', VideoView.as_view(), name='upload_video'),  #upload video
+    path('api/artist/video/status/<int:video_id>/', VideoView.as_view(), name='check_status_upload_video'),  #upload video
+    
     #ADMIN 
     path('api/admin/artist-registration-requests/<int:page>/', ArtistRegistrationView.as_view(), name='artist-registration'),
     path('api/admin/artist-registration/<str:action>/<int:id>/', ArtistRegistrationView.as_view(), name='artist-registration'),

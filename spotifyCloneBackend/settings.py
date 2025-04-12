@@ -263,3 +263,23 @@ CHANNEL_LAYERS = {
     },
 }
 
+
+
+
+# Celery Configuration
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Sử dụng Redis làm message broker
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Lưu kết quả vào Redis
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
+
+# settings.py
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Hoặc RabbitMQ
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
+CELERY_TASK_SOFT_TIME_LIMIT = 1800  # 30 phút
+CELERY_TASK_TIME_LIMIT = 2000      # Hard limit
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
