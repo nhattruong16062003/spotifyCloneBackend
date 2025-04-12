@@ -14,8 +14,7 @@ from .views.SearchView import SearchView
 from .views.PublicProfileView import PublicProfileView
 from .views.PlaylistSongView import PlaylistSongView
 from .views.PremiumPlanView import PremiumPlanView
-from rest_framework.routers import DefaultRouter
-
+from .views.ConversationView import ConversationView
 #chat
 from django.urls import re_path
 from .views.Consumers import Consumers
@@ -62,6 +61,8 @@ urlpatterns = [
     path('api/public-profile/popular-songs/<int:profile_id>/',PublicProfileView.as_view(), name='popular_song'),
 
     path('messages/<int:other_user_id>/', MessageListView.as_view(), name='message-list'),
+    path('api/conversations/user/', ConversationView.as_view(), name='conversations'),
+    path('api/conversations/mark-read/<int:conversation_id>/', ConversationView.as_view(), name='conversations'),
     
     #PREMIUM
     path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),

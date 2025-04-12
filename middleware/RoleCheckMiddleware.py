@@ -68,6 +68,8 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/public-profile/popular-songs/",
             "/api/cash-payment/",
             "/api/premium/update/order-playlist/",
+            "/api/conversations/user/",
+            "/api/conversations/mark-read/",
         ),
     }
 
