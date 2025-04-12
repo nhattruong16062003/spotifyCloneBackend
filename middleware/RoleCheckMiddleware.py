@@ -22,6 +22,10 @@ class RoleCheckMiddleware(MiddlewareMixin):
         "/api/search/",
         "/api/playlists/songs/",
         "/api/public-profile/",
+
+        #Để ở đây để không dùng middleware này kiểm tra url của chat mà dùng một middleware khác
+        "/ws/chat/testroom/",
+        "/api/messages/",
     )
 
     # Quyền truy cập theo role
