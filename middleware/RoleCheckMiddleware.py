@@ -16,6 +16,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
         "/api/trending/songs/",
         "/api/trending/albums/",
         "/api/trending/artists/",
+        "/api/trending/videos/",
         "/api/auth/activate/",
         "/api/auth/login/google/",
         "/api/auth/password-reset/",
@@ -26,8 +27,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
         #Để ở đây để không dùng middleware này kiểm tra url của chat mà dùng một middleware khác
         "/ws/chat/testroom/",
         "/api/messages/",
-
-        "/api/video/",
+        "/api/video/play/",
     )
 
     # Quyền truy cập theo role
@@ -74,6 +74,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/premium/update/order-playlist/",
             "/api/conversations/user/",
             "/api/conversations/mark-read/",
+            "/api/video/download/",
         ),
     }
 

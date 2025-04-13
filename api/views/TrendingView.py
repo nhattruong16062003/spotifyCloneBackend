@@ -21,6 +21,9 @@ class TrendingView(APIView):
             elif 'artists' in path:
                 data = TrendingService.get_trending_artists(limit=10)
                 key = 'trending_artists'
+            elif 'videos' in path:
+                data = TrendingService.get_trending_videos(limit=10)
+                key = 'trending_videos'
             else:
                 return Response({"error": "Invalid trending type"}, status=status.HTTP_400_BAD_REQUEST)
 
