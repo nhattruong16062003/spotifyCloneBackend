@@ -16,9 +16,15 @@ class Consumers(AsyncWebsocketConsumer):
         query_params = dict(qp.split("=") for qp in query_string.split("&") if qp)
         self.other_user_id = query_params.get("otherUserId")
 
-        if not self.other_user_id:
-            await self.close()
-            return
+        # # Kiểm tra nếu otherUserId không tồn tại hoặc trùng với user_id
+        # if not self.other_user_id or self.other_user_id == self.user_id:
+        #     await self.close()
+        #     return
+
+        # # Kiểm tra xem other_user_id có phải là artist (role_id=2) hay không
+        # if User.objects.get(id=self.other_user_id).role_id == 2:
+        #     await self.close()
+        #     return
 
         # Kiểm tra xem otherUserId có online và trong room với user_id không
         existing_room = None
@@ -66,6 +72,22 @@ class Consumers(AsyncWebsocketConsumer):
         receiver_id = data['receiver']
         sender_id = self.scope["user"].id
 
+        # # Kiểm tra nếu sender và receiver trùng nhau
+        # if sender_id == receiver_id:
+        #     await self.send(text_data=json.dumps({
+        #         "type": "error",
+        #         "message": "Cannot send message to yourself"
+        #     }))
+        #     return
+
+        # # Kiểm tra nếu receiver là artist (role_id=2)
+        # if User.objects.get(id=receiver_id).role_id == 2:
+        #     await self.send(text_data=json.dumps({
+        #         "type": "error",
+        #         "message": "Cannot send message to an artist"
+        #     }))
+        #     return
+
         await self.save_message(sender_id, receiver_id, message)
 
         await self.channel_layer.group_send(
@@ -91,6 +113,19 @@ class Consumers(AsyncWebsocketConsumer):
         try:
             sender = User.objects.get(id=sender_id)
             receiver = User.objects.get(id=receiver_id)
+
+            # # Kiểm tra lại lần nữa để đảm bảo
+            # if sender_id == receiver_id:
+            #     return
+            # if receiver.role_id == 2:  # Artist có role_id=2
+            #     return
+
+            # Tạo hoặc lấy conversation
+            conversation, _ = Conversation.objects.get_or_create(
+                user1=sender if sender.id < receiver.id else receiver,
+                user2=receiver if sender.id < receiver.id else sender,
+            )
+
             # Tạo hoặc lấy conversation
             conversation, _ = Conversation.objects.get_or_create(
                 user1=sender if sender.id < receiver.id else receiver,

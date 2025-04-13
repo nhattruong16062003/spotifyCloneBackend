@@ -8,8 +8,6 @@ from rest_framework.pagination import PageNumberPagination
 from api.serializers.ArtistRegistrationSerializer import ArtistRegistrationSerializer
 
 class ArtistRegistrationView(APIView):
-    # Permisstion để check xem người truy cập đến tất cả api trong này đã đăng nhập chưa và có phải là admin không
-    # permission_classes = [IsAdmin]
     """
     API endpoint để lấy tất cả yêu cầu đăng ký nghệ sĩ.
     """
