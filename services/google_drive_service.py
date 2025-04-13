@@ -12,18 +12,18 @@ from models.models import User,Video
 
 logger = logging.getLogger(__name__)
 
-# SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
-# SERVICE_ACCOUNT_FILE = 'zmusic-456605-3f7931d3cb29.json'
+SCOPES = ['https://www.googleapis.com/auth/drive']
+SERVICE_ACCOUNT_FILE = 'zmusic-456605-3f7931d3cb29.json'
 
 # Cập nhật scopes để hỗ trợ upload
-SCOPES = [
-    'https://www.googleapis.com/auth/drive.file',  # Chỉ cần quyền upload và quản lý file được tạo
-    'https://www.googleapis.com/auth/drive.readonly'  # Giữ quyền đọc
-]
+# SCOPES = [
+#     'https://www.googleapis.com/auth/drive.file',  # Chỉ cần quyền upload và quản lý file được tạo
+#     'https://www.googleapis.com/auth/drive.readonly'  # Giữ quyền đọc
+# ]
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'spotifyCloneBackend', 'zmusic-456605-3f7931d3cb29.json')
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'spotifyCloneBackend', 'zmusic-456605-3f7931d3cb29.json')
 
 
 def get_drive_service():
@@ -243,3 +243,17 @@ def delete_video_from_drive(file_id):
     except Exception as e:
         logger.error(f"Lỗi khi xóa video trên Google Drive (ID: {file_id}): {str(e)}")
         # Có thể raise lại nếu muốn rollback tiếp
+
+def download_file_from_drive(file_id):
+    drive_service = get_drive_service()
+    request = drive_service.files().get_media(fileId=file_id)
+    
+    fh = io.BytesIO()
+    downloader = MediaIoBaseDownload(fh, request)
+    
+    done = False
+    while not done:
+        status, done = downloader.next_chunk()
+    
+    fh.seek(0)
+    return fh.read()

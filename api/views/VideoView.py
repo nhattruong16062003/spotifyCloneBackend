@@ -16,14 +16,11 @@ class VideoView(APIView):
 
         try:
             with transaction.atomic():
-                print("ten video", request.POST.get('title'))
                 
                 title = request.POST.get('title')
                 description = request.POST.get('description')
                 video_file = request.FILES.get('videoFile')
                 image_file = request.FILES.get('imageFile')
-
-                print("video file", video_file)
 
                 # Upload video lên Google Drive
                 video_id = upload_video_to_drive(

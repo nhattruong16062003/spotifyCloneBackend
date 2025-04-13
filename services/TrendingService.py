@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
-from models.models import Song ,Playlist,User 
+from models.models import Song ,Playlist,User ,Video
 # from models.models import Song, Playlist, Album  # Import các model
 from api.serializers.SongSerializer import SongSerializer  # Import serializers
 from api.serializers.PlaylistSerializer import PlaylistSerializer  # Import serializers
@@ -109,4 +109,29 @@ class TrendingService:
 
         except Exception as e:
             print(f"Error fetching trending artists: {str(e)}")
+            return []
+        
+    @staticmethod
+    def get_trending_videos(limit=10):
+        try:
+            # Calculate the date 30 days ago
+            thirty_days_ago = timezone.now() - timedelta(days=30)
+
+            # Get top videos based on play count in the last 30 days
+            trending_videos = (
+                Video.objects
+                .annotate(play_count_recent=Count(
+                    'play_history',
+                    filter=Q(play_history__played_at__gte=thirty_days_ago)
+                ))
+                .order_by('-play_count_recent')  # Sort by play count descending
+                [:limit]  # Limit to specified number
+            )
+
+            # Serialize data (assuming a VideoSerializer exists)
+            from api.serializers.VideoSerializer import VideoSerializer
+            return VideoSerializer(trending_videos, many=True).data
+
+        except Exception as e:
+            print(f"Error fetching trending videos: {str(e)}")
             return []
