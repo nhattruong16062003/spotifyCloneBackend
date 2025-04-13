@@ -14,12 +14,13 @@ from .views.SearchView import SearchView
 from .views.PublicProfileView import PublicProfileView
 from .views.PlaylistSongView import PlaylistSongView
 from .views.PremiumPlanView import PremiumPlanView
-from rest_framework.routers import DefaultRouter
+from .views.ConversationView import ConversationView
 #chat
 from django.urls import re_path
 from .views.Consumers import Consumers
 from .views.MessageListView import MessageListView
 from .views.StreamVideoView import StreamVideoView
+from .views.VideoView import VideoView
 
 
 urlpatterns = [
@@ -62,9 +63,10 @@ urlpatterns = [
     path('api/public-profile/popular-songs/<int:profile_id>/',PublicProfileView.as_view(), name='popular_song'),
 
     path('messages/<int:other_user_id>/', MessageListView.as_view(), name='message-list'),
-
+    path('api/conversations/user/', ConversationView.as_view(), name='conversations'),
+    path('api/conversations/mark-read/<int:conversation_id>/', ConversationView.as_view(), name='conversations'),
     path('api/video/', StreamVideoView.as_view(), name='stream-video'),
-    
+  
     #PREMIUM
     path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),
 
@@ -76,7 +78,9 @@ urlpatterns = [
 
     path('api/artist/song/', SongView.as_view(), name='add_song'), #upload
     path('api/artist/fetch-artist-collab/', FindArtistCollab.as_view(), name='get-artist-collab'), 
-
+    path('api/artist/video/', VideoView.as_view(), name='upload_video'),  #upload video
+    path('api/artist/video/status/<int:video_id>/', VideoView.as_view(), name='check_status_upload_video'),  #upload video
+    
     #ADMIN 
     path('api/admin/artist-registration-requests/<int:page>/', ArtistRegistrationView.as_view(), name='artist-registration'),
     path('api/admin/artist-registration/<str:action>/<int:id>/', ArtistRegistrationView.as_view(), name='artist-registration'),

@@ -13,5 +13,7 @@ from .artist_registration import ArtistRegistration
 from .artist_collab import ArtistCollab
 from .conversation import Conversation
 from .message import Message
+from .video_play_history import VideoPlayHistory
+from .video import Video
 
 

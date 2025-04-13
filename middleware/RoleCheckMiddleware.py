@@ -50,6 +50,8 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/artist/albums/",
             "/api/artist/song/",
             "/api/artist/create-album/",
+            "/api/artist/video/",
+            "/api/artist/video/status/",
         ),
         3: (  # USER
             "/api/user/",
@@ -70,6 +72,8 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/public-profile/popular-songs/",
             "/api/cash-payment/",
             "/api/premium/update/order-playlist/",
+            "/api/conversations/user/",
+            "/api/conversations/mark-read/",
         ),
     }
 
