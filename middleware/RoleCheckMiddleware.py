@@ -75,6 +75,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/conversations/user/",
             "/api/conversations/mark-read/",
             "/api/video/download/",
+            "/api/video/history/",
         ),
     }
 
