@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from models.user import User
+from models.artist_collab import ArtistCollab
 from api.serializers.UserSerializer import UserSerializer
 from api.serializers.PlaylistSerializer import PlaylistSerializer
 from models.models import Song, Playlist, PlaylistSong
@@ -11,9 +12,16 @@ from api.serializers.SongSerializer import SongSerializer
 from django.utils import timezone
 from datetime import timedelta
 from django.db import models
+from rest_framework.pagination import PageNumberPagination
 
+
+class ConversationPagination(PageNumberPagination):
+    page_size = 1
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 class PublicProfileView(APIView):
+    pagination_class = ConversationPagination  # Đặt pagination class cho view
     # permission_classes = [IsAuthenticated]
     def get(self, request, profile_id):
         if(request.path.startswith('/api/public-profile/albums/')):
@@ -40,47 +48,35 @@ class PublicProfileView(APIView):
 
     def get_popular_songs_by_id(self, request, profile_id):
         """
-        Lấy danh sách 10 bài hát phổ biến nhất của artist dựa trên lượt nghe trong 30 ngày qua.
-        
-        Args:
-            self: Instance của class (nếu dùng trong class-based view)
-            request: HTTP request object
-            profile_id: ID của artist/user để lọc bài hát
-        
-        Returns:
-            Response: Đối tượng Response chứa dữ liệu serialized của các bài hát hoặc lỗi
+        Lấy danh sách bài hát phổ biến nhất của artist (bao gồm collab) với phân trang.
         """
         try:
-           
-            # Tính thời điểm 30 ngày trước
-            thirty_days_ago = timezone.now() - timedelta(days=30)
+            # Kiểm tra xem user có tồn tại không
+            if not User.objects.filter(id=profile_id).exists():
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-            # Lấy top 10 bài hát phổ biến dựa trên lượt nghe trong 30 ngày qua
-            trending_songs = (
-                Song.objects
-                .filter(user_id=profile_id)  # Lọc bài hát theo artist
-                .annotate(play_count_recent=models.Count(
-                    'play_history',  # Đếm lượt nghe từ SongPlayHistory
-                    filter=models.Q(play_history__played_at__gte=thirty_days_ago)  # Chỉ tính trong 30 ngày
-                ))
-                .order_by('-play_count_recent')  # Sắp xếp theo số lượt nghe giảm dần
-                [:10]  # Giới hạn top 10
-            )
+            # Lấy ID bài hát của artist và bài hát collab
+            own_song_ids = Song.objects.filter(user_id=profile_id).values_list('id', flat=True)
+            collab_song_ids = ArtistCollab.objects.filter(user_id=profile_id).values_list('song', flat=True)
+
+            # Hợp nhất danh sách ID bài hát
+            all_song_ids = set(own_song_ids) | set(collab_song_ids)
+
+            # Lấy bài hát và sắp xếp theo uploaded_at
+            songs = Song.objects.filter(id__in=all_song_ids).order_by('-uploaded_at')
+
+            # Áp dụng phân trang
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(songs, request, view=self)
+
             # Serialize dữ liệu
-            song_data = SongSerializer(trending_songs, many=True).data
-            # Trả về Response với dữ liệu thành công
-            return Response(
-                {
-                    "total": len(song_data),
-                    "songs": song_data
-                },
-                status=status.HTTP_200_OK
-            )
+            serializer = SongSerializer(page, many=True, context={'request': request})
+
+            # Trả về response với phân trang
+            return paginator.get_paginated_response(serializer.data)
 
         except Exception as e:
-            # Trả về Response với thông báo lỗi
-            error_message = f"Error fetching popular songs for profile_id {profile_id}: {str(e)}"
             return Response(
-                {"error": error_message},
+                {"error": f"Error fetching popular songs for profile_id {profile_id}: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

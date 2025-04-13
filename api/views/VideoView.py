@@ -16,8 +16,6 @@ class VideoView(APIView):
 
         try:
             with transaction.atomic():
-                print("ten video", request.POST.get('title'))
-                
                 title = request.POST.get('title')
                 description = request.POST.get('description')
                 video_file = request.FILES.get('videoFile')
@@ -52,7 +50,7 @@ class VideoView(APIView):
                     'title': video.title,
                     'image_path': video.image_path
                 }
-            })
+            },status=201)
              
         except Exception as e:
             # Nếu ảnh đã upload thì tiến hành xóa ảnh trên AWS S3
