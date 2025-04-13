@@ -21,6 +21,8 @@ from .views.Consumers import Consumers
 from .views.MessageListView import MessageListView
 from .views.StreamVideoView import StreamVideoView
 from .views.VideoView import VideoView
+from .views.DownloadVideoView import DownloadVideoView
+from .views.VideoHistoryView import VideoHistoryView
 
 
 urlpatterns = [
@@ -38,6 +40,7 @@ urlpatterns = [
     path('api/trending/playlists/', TrendingView.as_view(), name='trending_playlists'),
     path('api/trending/albums/', TrendingView.as_view(), name='trending_albums'),
     path('api/trending/artists/', TrendingView.as_view(), name='trending_artists'),
+    path('api/trending/videos/', TrendingView.as_view(), name='trending_videos'),
 
     path('api/song/previous/<int:song_id>/', SongView.as_view(), name='previous_song'),
     path('api/song/next/<int:song_id>/', SongView.as_view(), name='next_song'),
@@ -65,7 +68,10 @@ urlpatterns = [
     path('messages/<int:other_user_id>/', MessageListView.as_view(), name='message-list'),
     path('api/conversations/user/', ConversationView.as_view(), name='conversations'),
     path('api/conversations/mark-read/<int:conversation_id>/', ConversationView.as_view(), name='conversations'),
-    path('api/video/', StreamVideoView.as_view(), name='stream-video'),
+    path('api/video/play/', StreamVideoView.as_view(), name='stream-video'),
+    path('api/video/download/', DownloadVideoView.as_view(), name='video-download'),
+    path('api/video/history/', VideoHistoryView.as_view(), name='add-video-history'),
+
   
     #PREMIUM
     path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),

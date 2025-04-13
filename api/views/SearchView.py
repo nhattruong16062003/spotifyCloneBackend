@@ -3,18 +3,25 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from django.db.models import Count
-from models.models import Song, User, Playlist
+from models.models import Song, User, Playlist, Video
 from api.serializers.UserSerializer import UserSerializer
 from api.serializers.PlaylistSerializer import PlaylistSerializer
 from api.serializers.SongSerializer import SongSerializer
 from rest_framework import status
 from services.TrendingService import TrendingService
 from services.SearchService import SearchService
+from api.serializers.VideoSerializer import VideoSerializer  
+
 
 class SearchView(APIView):
     def get(self, request, keyword=None, *args, **kwargs):
         data_type = request.query_params.get('selectedType', None)
         keyword= request.query_params.get('searchKeyword', None)
+        # Lấy user_id nếu đã đăng nhập
+        user_id = None
+        if request.user and request.user.is_authenticated:
+            user_id = request.user.id
+
         try:
             limit = int(request.query_params.get('limit', 15))
         except (TypeError, ValueError):
@@ -46,15 +53,19 @@ class SearchView(APIView):
                 trending_songs = TrendingService.get_trending_songs(20)
                 serializer = SongSerializer(trending_songs, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            elif data_type == "video":
+                trending_videos = TrendingService.get_trending_videos(20)
+                serializer = VideoSerializer(trending_videos, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'Invalid type parameter'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Gọi SearchService để lấy dữ liệu
-        queryset = SearchService.search(data_type, keyword,limit, offset)
+        # Gọi SearchService với user_id (có thể là None nếu không đăng nhập)
+        queryset = SearchService.search(data_type, keyword, limit, offset, user_id=user_id)
 
         # Xử lý trường hợp không hợp lệ hoặc không tìm thấy dữ liệu
         if queryset is None:
-            if data_type in ["playlists", "albums"]:
+            if data_type in ["playlists", "albums", "videos"]:
                 return Response({'error': f'No {data_type} found'}, status=status.HTTP_404_NOT_FOUND)
             print(f"Invalid request received with type: {data_type} and keyword: {keyword}")
             return Response({'error': 'Invalid type parameter'}, status=status.HTTP_400_BAD_REQUEST)
@@ -66,6 +77,8 @@ class SearchView(APIView):
             serializer = SongSerializer(queryset, many=True)
         elif data_type in ["playlists", "albums"]:
             serializer = PlaylistSerializer(queryset, many=True)
+        elif data_type == "videos": 
+            serializer = VideoSerializer(queryset, many=True)
 
         # Trả về kết quả phân trang
         return Response(serializer.data, status=status.HTTP_200_OK)

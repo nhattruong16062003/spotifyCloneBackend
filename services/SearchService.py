@@ -2,24 +2,30 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
-from models.models import User, Song, Playlist
+from models.models import User, Song, Playlist,Video
 
 class SearchService:
 
     @staticmethod
-    def search_users(keyword, limit, offset):
+    def search_users(keyword, limit, offset, user_id):
         """Tìm kiếm users theo keyword (role_id=3) với phân trang"""
-         # Chuyển đổi limit và offset thành số nguyên
+        # Chuyển đổi limit và offset thành số nguyên
         limit = int(limit)
         offset = int(offset) * limit
 
         # Truy vấn và lọc user (vai trò user thường, role_id=3)
-        users = User.objects.filter(
+        query = User.objects.filter(
             name__icontains=keyword,
             role_id=3,
             is_active=True,
             is_ban=False
-        ).distinct()
+        )
+        
+        # Nếu user_id không phải None, loại trừ user có id=user_id
+        if user_id is not None:
+            query = query.exclude(id=user_id)
+            
+        users = query.distinct()
 
         # Tính toán phân trang
         paginated_results = users[offset:offset+limit]
@@ -241,12 +247,53 @@ class SearchService:
         paginated_results = all_albums[offset:offset+limit]
 
         return paginated_results
+    
+    @staticmethod
+    def search_videos(keyword, limit, offset):
+        """
+        Tìm kiếm videos theo keyword với thứ tự ưu tiên:
+        1. Tên video (title)
+        2. Tên chủ sở hữu video (uploaded_by)
+        Args:
+            keyword (str): Từ khóa tìm kiếm
+            limit (int): Số lượng kết quả tối đa trên mỗi trang
+            offset (int): Vị trí bắt đầu (dùng cho phân trang)
+        """
+        # Chuyển đổi limit và offset thành số nguyên
+        limit = int(limit)
+        offset = int(offset) * limit
+
+        # 1. Tìm video theo tiêu đề
+        videos_by_title = Video.objects.filter(
+            Q(title__icontains=keyword) &
+            Q(uploaded_by__is_active=True) &
+            Q(uploaded_by__is_ban=False)
+        ).distinct()
+
+        # 2. Tìm video theo tên chủ sở hữu
+        videos_by_owner = Video.objects.filter(
+            Q(uploaded_by__name__icontains=keyword) &
+            Q(uploaded_by__is_active=True) &
+            Q(uploaded_by__is_ban=False)
+        ).distinct()
+
+
+        # Kết hợp các kết quả theo thứ tự ưu tiên
+        all_videos = list(dict.fromkeys(
+            list(videos_by_title) +
+            list(videos_by_owner)
+        ))
+
+        # Tính toán phân trang
+        paginated_results = all_videos[offset:offset+limit]
+
+        return paginated_results
 
     @staticmethod
-    def search(data_type, keyword, limit, offset):
+    def search(data_type, keyword, limit, offset,user_id):
         """Tìm kiếm dữ liệu dựa trên data_type và keyword"""
         if data_type == "users":
-            return SearchService.search_users(keyword, limit, offset)
+            return SearchService.search_users(keyword, limit, offset,user_id)
         elif data_type == "artists":
             return SearchService.search_artists(keyword, limit, offset)
         elif data_type == "songs":
@@ -255,5 +302,7 @@ class SearchService:
             return SearchService.search_playlists(keyword, limit, offset)
         elif data_type == "albums":
             return SearchService.search_albums(keyword, limit, offset)
+        elif data_type == "videos":
+            return SearchService.search_videos(keyword, limit, offset)
         else:
             return None

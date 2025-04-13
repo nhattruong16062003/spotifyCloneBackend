@@ -21,8 +21,6 @@ class VideoView(APIView):
                 video_file = request.FILES.get('videoFile')
                 image_file = request.FILES.get('imageFile')
 
-                print("video file", video_file)
-
                 # Upload video lên Google Drive
                 video_id = upload_video_to_drive(
                     file_stream=video_file,
