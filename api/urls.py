@@ -22,6 +22,8 @@ from .views.MessageListView import MessageListView
 from .views.StreamVideoView import StreamVideoView
 from .views.VideoView import VideoView
 from .views.DownloadVideoView import DownloadVideoView
+from .views.VideoHistoryView import VideoHistoryView
+
 
 urlpatterns = [
     #PUBLIC
@@ -68,6 +70,8 @@ urlpatterns = [
     path('api/conversations/mark-read/<int:conversation_id>/', ConversationView.as_view(), name='conversations'),
     path('api/video/play/', StreamVideoView.as_view(), name='stream-video'),
     path('api/video/download/', DownloadVideoView.as_view(), name='video-download'),
+    path('api/video/history/', VideoHistoryView.as_view(), name='add-video-history'),
+
   
     #PREMIUM
     path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),
