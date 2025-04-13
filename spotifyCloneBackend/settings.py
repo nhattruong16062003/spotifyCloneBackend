@@ -136,8 +136,8 @@ DATABASES = {
         'NAME': config('DATABASE_NAME', default='spotify_db'),
         'USER': config('DATABASE_USER', default='user'),
         'PASSWORD': config('DATABASE_PASSWORD', default='12345'),
-        # 'HOST': config('DATABASE_HOST', default='db'), #dùng cho production
-        'HOST': '127.0.0.1',  # 👈 Đổi từ 'db' thành '127.0.0.1'
+        'HOST': config('DATABASE_HOST', default='db'), #dùng cho production
+        # 'HOST': '127.0.0.1',  # 👈 Đổi từ 'db' thành '127.0.0.1'
         'PORT': config('DATABASE_PORT', default='3306'),
     }
 }
@@ -254,12 +254,12 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         #DELOY MỎ CMT KHÔNG XÓA CODE NÀY
-        # "CONFIG": {
-        #     "hosts": [("redis", 6379)],
-        # }, 
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],  # ← Sửa ở đây
-        },
+            "hosts": [("redis", 6379)],
+        }, 
+        # "CONFIG": {
+        #     "hosts": [("127.0.0.1", 6379)],  # ← Sửa ở đây
+        # },
     },
 }
 
