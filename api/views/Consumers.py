@@ -17,14 +17,9 @@ class Consumers(AsyncWebsocketConsumer):
         self.other_user_id = query_params.get("otherUserId")
 
         # # Kiểm tra nếu otherUserId không tồn tại hoặc trùng với user_id
-        # if not self.other_user_id or self.other_user_id == self.user_id:
-        #     await self.close()
-        #     return
-
-        # # Kiểm tra xem other_user_id có phải là artist (role_id=2) hay không
-        # if User.objects.get(id=self.other_user_id).role_id == 2:
-        #     await self.close()
-        #     return
+        if not self.other_user_id or self.other_user_id == self.user_id:
+            await self.close()
+            return
 
         # Kiểm tra xem otherUserId có online và trong room với user_id không
         existing_room = None
