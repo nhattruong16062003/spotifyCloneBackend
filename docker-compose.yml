@@ -5,6 +5,7 @@ services:
     image: mysql:8.0
     volumes:
       - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-spotify_db}
@@ -23,9 +24,6 @@ services:
       context: .
       dockerfile: Dockerfile
     command: /entrypoint.sh
-    #  KHÔNG mount volume trong production
-    volumes:
-      - .:/app # ← XÓA DÒNG NÀY
     ports:
       - "8000:8000"
     environment:
