@@ -52,6 +52,7 @@ class RoleCheckMiddleware(MiddlewareMixin):
             "/api/artist/create-album/",
             "/api/artist/video/",
             "/api/artist/video/status/",
+            "/api/artist/create-album",
         ),
         3: (  # USER
             "/api/user/",
