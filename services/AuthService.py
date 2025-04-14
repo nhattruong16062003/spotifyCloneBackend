@@ -14,6 +14,9 @@ from django.db import transaction
 from rest_framework.response import Response
 from rest_framework import status
 from services.EmailService import send_custom_email
+import os
+
+URL_FRONTEND = os.getenv("URL_FRONTEND", "http://localhost:3000")
 
 User = get_user_model()
 
@@ -24,7 +27,7 @@ class AuthService:
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
-        activation_url = f"http://localhost:3000/activate/{uid}/{token}"  # URL frontend
+        activation_url = f"{URL_FRONTEND}/activate/{uid}/{token}"
 
         # Gửi email bằng send_custom_email từ EmailService
         send_custom_email(
