@@ -14,10 +14,10 @@ class Consumers(AsyncWebsocketConsumer):
         # Lấy otherUserId từ query string
         query_string = self.scope["query_string"].decode()
         query_params = dict(qp.split("=") for qp in query_string.split("&") if qp)
-        self.other_user_id = query_params.get("otherUserId")
+        self.other_user_id = str(query_params.get("otherUserId"))  # Ép kiểu sang string
 
         # # Kiểm tra nếu otherUserId không tồn tại hoặc trùng với user_id
-        if not self.other_user_id or self.other_user_id == self.user_id:
+        if not self.other_user_id or self.other_user_id == self.user_id :
             await self.close()
             return
 
