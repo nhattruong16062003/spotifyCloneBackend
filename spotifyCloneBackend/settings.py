@@ -10,6 +10,8 @@ pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DEFAULT_CHARSET = 'utf-8'
+
 load_dotenv()  # Load biến môi trường từ file .env
 
 MP3_AWS_ACCESS_KEY_ID = os.getenv("MP3_AWS_ACCESS_KEY_ID")
@@ -136,13 +138,14 @@ DATABASES = {
         'NAME': config('DATABASE_NAME', default='spotify_db'),
         'USER': config('DATABASE_USER', default='user'),
         'PASSWORD': config('DATABASE_PASSWORD', default='12345'),
-        'HOST': config('DATABASE_HOST', default='db'), #dùng cho production
-        # 'HOST': '127.0.0.1',  # 👈 Đổi từ 'db' thành '127.0.0.1'
+        'HOST': config('DATABASE_HOST', default='db'),  # Dùng cho production
         'PORT': config('DATABASE_PORT', default='3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',  # Thêm dòng này để đảm bảo mã hóa tiếng Việt
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', character_set_connection=utf8mb4, collation_connection=utf8mb4_unicode_ci",
+        },
     }
 }
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
