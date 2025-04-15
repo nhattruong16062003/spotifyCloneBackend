@@ -23,6 +23,7 @@ from .views.StreamVideoView import StreamVideoView
 from .views.VideoView import VideoView
 from .views.DownloadVideoView import DownloadVideoView
 from .views.VideoHistoryView import VideoHistoryView
+from .views.UpdateImagePlaylistView import UpdateImagePlaylistView
 
 
 urlpatterns = [
@@ -75,6 +76,7 @@ urlpatterns = [
   
     #PREMIUM
     path('api/premium/update/order-playlist/', PlaylistSongView.as_view(), name='update-order-playlist'),
+    path('api/premium/update/image/', UpdateImagePlaylistView.as_view(), name='update-image-playlist'),
 
     # ARTIST
     path('api/artist/songs/', SongView.as_view(), name='artist_song'),
