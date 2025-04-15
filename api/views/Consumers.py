@@ -34,8 +34,8 @@ class Consumers(AsyncWebsocketConsumer):
             else:
                 ordered_user1, ordered_user2 = user2, user1
 
-            # Sử dụng transaction để đảm bảo tính toàn vẹn
-            async def find_or_create_conversation():
+            # Hàm đồng bộ để tìm hoặc tạo conversation
+            def find_or_create_conversation():
                 with transaction.atomic():
                     conversation = Conversation.objects.filter(
                         user1=ordered_user1, user2=ordered_user2
@@ -46,6 +46,7 @@ class Consumers(AsyncWebsocketConsumer):
                         )
                     return conversation
 
+            # Gọi hàm đồng bộ thông qua database_sync_to_async
             conversation = await database_sync_to_async(find_or_create_conversation)()
 
         except User.DoesNotExist:
