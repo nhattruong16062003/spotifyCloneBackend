@@ -14,7 +14,6 @@ from django.db import transaction
 
 class PlaylistView(APIView):
     def get(self, request, song_id=None, playlist_id=None):
-        print("cocmcmmc")
         user_id = request.user.id  # Lấy user_id
         """API lấy danh sách playlist của user nhưng chưa chứa song_id"""
         if request.path.startswith(f"/api/playlist/user/"):  # Kiểm tra URL
@@ -36,7 +35,6 @@ class PlaylistView(APIView):
                     user_role=request.user.role_id
                     if user_role == 3 and playlist.user_id == user_id and is_premium:
                         isOwner = True
-                print(isOwner)
                 
                 # Serialize thông tin playlist
                 playlist_serializer = PlaylistSerializer(playlist)

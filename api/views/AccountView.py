@@ -50,7 +50,6 @@ class AccountView(APIView):
         elif request.path == '/api/account/profile/':
             return self.get_user_info(request)
         elif request.path.startswith('/api/admin/accounts/'):
-            print("Ok")
             return self.get_all_users(request,page)
         else:
             return Response(

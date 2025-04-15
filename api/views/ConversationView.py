@@ -6,7 +6,7 @@ from django.db import models
 from models.models import Conversation,Message
 from api.serializers.ConversationSerializer import ConversationSerializer
 from django.shortcuts import get_object_or_404
-from django.db.models import OuterRef, Subquery, Max, Q
+from django.db.models import OuterRef, Subquery, Max, Q,F
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -20,40 +20,27 @@ class ConversationView(APIView):
     def get(self, request):
         user = request.user
 
+        # Lấy tất cả cuộc trò chuyện của user
         conversations = Conversation.objects.filter(
             Q(user1=user) | Q(user2=user)
         ).annotate(
-            last_message_time=Max('messages__sent_at'),
-            last_message_id=Subquery(
-                Message.objects.filter(conversation=OuterRef('pk'))
-                .order_by('-sent_at')
-                .values('id')[:1]
-            )
+            last_message_time=Max('messages__sent_at')
+        ).order_by(
+            # Sắp xếp: ưu tiên có last_message_time, sau đó theo thời gian giảm dần
+            F('last_message_time').desc(nulls_last=True)
         )
 
-
-        last_msg_ids = [c.last_message_id for c in conversations if c.last_message_id]
-
-        unread_ids = set(
-            Message.objects.filter(
-                id__in=last_msg_ids,
-                is_read=False
-            ).exclude(sender=user).values_list('id', flat=True)
-        )
-
-        convo_list = []
-        for convo in conversations:
-            convo.has_unread = convo.last_message_id in unread_ids
-            convo_list.append(convo)
-
-        convo_list.sort(
-            key=lambda c: (not c.has_unread, -c.last_message_time.timestamp() if c.last_message_time else 0)
-        )
+        # Phân trang
         paginator = self.pagination_class()
-        page = paginator.paginate_queryset(convo_list, request, view=self)
-        serializer = ConversationSerializer(page, many=True, context={'request': request})
-        return paginator.get_paginated_response(serializer.data)
+        page = paginator.paginate_queryset(conversations, request, view=self)
 
+        # Serialize dữ liệu
+        serializer = ConversationSerializer(
+            page, many=True, context={'request': request}
+        )
+
+        return paginator.get_paginated_response(serializer.data)
+    
     #Phương thức đánh dấu conversation đã được đọcđọc
     def post(self, request, conversation_id):
         user = request.user

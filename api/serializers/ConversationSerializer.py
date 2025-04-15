@@ -4,21 +4,20 @@ from api.serializers.UserSerializer import UserSerializer
 from api.serializers.MessageSerializer import MessageSerializer
 
 class ConversationSerializer(serializers.ModelSerializer):
-    user1 = UserSerializer(read_only=True)
-    user2 = UserSerializer(read_only=True)
-    messages = MessageSerializer(many=True, read_only=True)
+    other_user = serializers.SerializerMethodField()
     last_message = serializers.SerializerMethodField()
-    has_unread = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
-        fields = ['id', 'user1', 'user2', 'created_at', 'messages', 'last_message', 'has_unread']
+        fields = ['id', 'other_user', 'last_message']
+
+    def get_other_user(self, obj):
+        user = self.context['request'].user
+        other_user = obj.user2 if obj.user1 == user else obj.user1
+        return UserSerializer(other_user).data
 
     def get_last_message(self, obj):
-        last = obj.messages.order_by('-sent_at').first()
-        if last:
-            return MessageSerializer(last).data
+        last_message = obj.messages.order_by('-sent_at').first()
+        if last_message:
+            return MessageSerializer(last_message).data
         return None
-
-    def get_has_unread(self, obj):
-        return getattr(obj, 'has_unread', False)

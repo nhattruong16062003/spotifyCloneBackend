@@ -72,7 +72,6 @@ class AuthService:
             except User.DoesNotExist:
                 return None, "USER_NOT_FOUND"
 
-            print(f"Before authentication: {user}")
             # Tạo cặp token mới hoàn toàn
             new_refresh = RefreshToken.for_user(user)
             access_token = str(new_refresh.access_token)  # Access token mới

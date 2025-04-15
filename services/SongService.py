@@ -75,7 +75,6 @@ class SongService:
      
             return random_song.id
         else:
-            print("No other song available.")
             return None
 
         
