@@ -7,6 +7,7 @@ class PremiumCheckMiddleware(MiddlewareMixin):
     # Endpoint CHỈ DÀNH CHO PREMIUM
     PREMIUM_REQUIRED_ENDPOINTS = (
         "/api/premium/update/order-playlist/",
+        "/api/premium/update/image/"
     )
 
     # Endpoint CHỈ DÀNH CHO NON-PREMIUM
