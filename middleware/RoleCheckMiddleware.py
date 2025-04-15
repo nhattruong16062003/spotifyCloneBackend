@@ -97,7 +97,6 @@ class RoleCheckMiddleware(MiddlewareMixin):
                 pass  # Giữ request.user là AnonymousUser nếu token lỗi
 
         # Bỏ qua kiểm tra nếu là endpoint công khai
-        print(self._is_public_endpoint(request.path))
         if self._is_public_endpoint(request.path):
             return None
 
