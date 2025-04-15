@@ -69,7 +69,7 @@ class Command(BaseCommand):
                 'role': artist_role,  
                 'is_active': True,
                 'is_ban': False,
-                'image_path': None',
+                'image_path': None,
                 'created_at': timezone.make_aware(datetime.datetime(2025, 4, 13, 21, 3, 29)),
             },
             {
