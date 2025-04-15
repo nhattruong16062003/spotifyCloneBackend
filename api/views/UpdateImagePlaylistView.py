@@ -18,8 +18,6 @@ class UpdateImagePlaylistView(APIView):
             playlist_id = request.data.get("playlistId")
             files = request.FILES
 
-            print("platlist id",playlist_id)
-
             if not playlist_id:
                 return Response(
                     {"error": "playlistId is required"},
@@ -44,15 +42,7 @@ class UpdateImagePlaylistView(APIView):
                     image_name = f"images/{image.name}"
                     image_url = UploadService.upload_image_to_s3(image, image_name)
 
-                    # B2: Xóa ảnh cũ trên S3 nếu playlist đã có ảnh
-                    if playlist.image_path:
-                        try:
-                            UploadService.delete_image_from_s3(playlist.image_path)
-                        except Exception as e:
-                            # Log lỗi nhưng không làm gián đoạn nếu xóa ảnh cũ thất bại
-                            print(f"Error deleting old image from S3: {str(e)}")
-
-                    # B3: Cập nhật link ảnh mới vào database
+                    # B2: Cập nhật link ảnh mới vào database
                     playlist.image_path = image_url
                     playlist.save()
 
