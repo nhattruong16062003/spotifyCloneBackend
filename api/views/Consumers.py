@@ -2,8 +2,9 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
-from models.models import Conversation, Message,Q
+from models.models import Conversation, Message
 from spotifyCloneBackend.presence import online_users, active_rooms
+from django.db.models import  Q
 
 User = get_user_model()
 
