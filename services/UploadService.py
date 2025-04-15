@@ -11,7 +11,6 @@ class UploadService:
     @staticmethod
     def upload_mp3_to_s3(file, file_name):
         SECRET_KEY=settings.SECRET_KEY
-        print("key",SECRET_KEY)
         
         # Tạo tên tệp duy nhất bằng UUID và giữ lại phần mở rộng của tệp gốc
         unique_id = uuid.uuid4().hex

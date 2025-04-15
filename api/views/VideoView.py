@@ -26,7 +26,6 @@ class VideoView(APIView):
                     file_stream=video_file,
                     file_name=video_file.name
                 )
-                print("da vao ham upload video")
 
                 # Upload ảnh lên AWS S3
                 image_url = UploadService.upload_image_to_s3(image_file, f"images/{image_file.name}")
