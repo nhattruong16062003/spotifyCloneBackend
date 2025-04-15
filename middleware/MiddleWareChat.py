@@ -27,7 +27,6 @@ class JWTAuthMiddleware:
     async def __call__(self, scope, receive, send):
         # Lấy path từ scope
         path = scope.get("path", "")
-        print(path)
 
         # Nếu path không nằm trong danh sách cần xác thực, bỏ qua middleware
         if not any(path.startswith(p) for p in self.AUTH_REQUIRED_PATHS):
