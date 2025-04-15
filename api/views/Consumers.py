@@ -10,48 +10,43 @@ User = get_user_model()
 
 class Consumers(AsyncWebsocketConsumer):
     async def connect(self):
-        # Lấy user_id từ user đã xác thực
-        self.user_id = str(self.scope["user"].id)  # Chuyển thành string để nhất quán
-
-        # Lấy otherUserId từ query string
+        self.user_id = str(self.scope["user"].id)
         query_string = self.scope["query_string"].decode()
         query_params = dict(qp.split("=") for qp in query_string.split("&") if qp)
-        self.other_user_id = str(query_params.get("otherUserId"))  # Ép kiểu sang string
+        self.other_user_id = str(query_params.get("otherUserId"))
 
-        # Kiểm tra nếu otherUserId không tồn tại hoặc trùng với user_id
         if not self.other_user_id or self.other_user_id == self.user_id:
             await self.close()
             return
 
-        # Kiểm tra hoặc tạo Conversation trong database
         try:
-            user1 = User.objects.get(id=self.user_id)
-            user2 = User.objects.get(id=self.other_user_id)
+            # Sử dụng database_sync_to_async cho truy vấn cơ sở dữ liệu
+            user1 = await database_sync_to_async(User.objects.get)(id=self.user_id)
+            user2 = await database_sync_to_async(User.objects.get)(id=self.other_user_id)
 
-            # Kiểm tra nếu user1 và user2 giống nhau
             if user1 == user2:
                 await self.close()
                 return
 
-            # Tìm conversation hiện có giữa user_id và other_user_id
-            conversation = Conversation.objects.filter(
-                Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)
-            ).first()
+            # Tìm hoặc tạo conversation
+            conversation = await database_sync_to_async(
+                lambda: Conversation.objects.filter(
+                    Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)
+                ).first()
+            )()
 
-            # Nếu không có conversation, tạo mới
             if not conversation:
-                conversation = Conversation.objects.create(user1=user1, user2=user2)
+                conversation = await database_sync_to_async(Conversation.objects.create)(
+                    user1=user1, user2=user2
+                )
 
         except User.DoesNotExist:
-            # Nếu một trong hai user không tồn tại, đóng kết nối
             await self.close()
             return
 
-        # Tạo room_name dựa trên user_id và other_user_id
-        self.room_name = "_".join(sorted([self.user_id, self.other_user_id]))  # ví dụ: "1_2"
+        self.room_name = "_".join(sorted([self.user_id, self.other_user_id]))
         self.room_group_name = f'private_chat_{self.room_name}'
 
-        # Join room
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
