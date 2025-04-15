@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from models.models import Conversation, Message
 from spotifyCloneBackend.presence import online_users, active_rooms
 from django.db.models import  Q
+from django.db import transaction
 
 User = get_user_model()
 
@@ -20,7 +21,6 @@ class Consumers(AsyncWebsocketConsumer):
             return
 
         try:
-            # Sử dụng database_sync_to_async cho truy vấn cơ sở dữ liệu
             user1 = await database_sync_to_async(User.objects.get)(id=self.user_id)
             user2 = await database_sync_to_async(User.objects.get)(id=self.other_user_id)
 
@@ -28,17 +28,25 @@ class Consumers(AsyncWebsocketConsumer):
                 await self.close()
                 return
 
-            # Tìm hoặc tạo conversation
-            conversation = await database_sync_to_async(
-                lambda: Conversation.objects.filter(
-                    Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)
-                ).first()
-            )()
+            # Chuẩn hóa: user1 luôn có ID nhỏ hơn
+            if int(self.user_id) < int(self.other_user_id):
+                ordered_user1, ordered_user2 = user1, user2
+            else:
+                ordered_user1, ordered_user2 = user2, user1
 
-            if not conversation:
-                conversation = await database_sync_to_async(Conversation.objects.create)(
-                    user1=user1, user2=user2
-                )
+            # Sử dụng transaction để đảm bảo tính toàn vẹn
+            async def find_or_create_conversation():
+                with transaction.atomic():
+                    conversation = Conversation.objects.filter(
+                        user1=ordered_user1, user2=ordered_user2
+                    ).first()
+                    if not conversation:
+                        conversation = Conversation.objects.create(
+                            user1=ordered_user1, user2=ordered_user2
+                        )
+                    return conversation
+
+            conversation = await database_sync_to_async(find_or_create_conversation)()
 
         except User.DoesNotExist:
             await self.close()
