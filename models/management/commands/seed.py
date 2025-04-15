@@ -1,7 +1,7 @@
 import datetime
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from spotifyCloneBackend.models import Role  # Điều chỉnh import theo cấu trúc dự án
+from models.models import Role  # Điều chỉnh import theo cấu trúc dự án
 from django.utils import timezone
 
 User = get_user_model()
