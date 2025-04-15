@@ -18,6 +18,8 @@ class UpdateImagePlaylistView(APIView):
             playlist_id = request.data.get("playlistId")
             files = request.FILES
 
+            print("platlist id",playlist_id)
+
             if not playlist_id:
                 return Response(
                     {"error": "playlistId is required"},
