@@ -89,7 +89,7 @@ class TrendingService:
             # Lấy danh sách nghệ sĩ có tổng số lượt nghe bài hát cao nhất trong 30 ngày qua
             trending_artists = (
                 Song.objects
-                .filter(playbackhistory__played_at__gte=thirty_days_ago)  # Lọc các bài hát có lượt nghe trong 30 ngày
+                .filter(play_history__played_at__gte=thirty_days_ago)  # Lọc các bài hát có lượt nghe trong 30 ngày
                 .values('user')  # Nhóm theo user (nghệ sĩ)
                 .annotate(total_plays=Count('playbackhistory'))  # Đếm tổng số lượt nghe
                 .order_by('-total_plays')  # Sắp xếp theo số lượt nghe giảm dần
