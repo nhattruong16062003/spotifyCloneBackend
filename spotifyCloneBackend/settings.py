@@ -227,6 +227,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",  # Thêm localhost nếu cần
     "http://103.164.81.90:3000",
     "http://54.253.254.30:3000",
+    "http://zmusic.io.vn",
+    "http://www.zmusic.io.vn",
 ]
 
 
