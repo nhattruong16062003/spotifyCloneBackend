@@ -16,7 +16,7 @@ from rest_framework import status
 from services.EmailService import send_custom_email
 import os
 
-URL_FRONTEND = os.getenv("URL_FRONTEND", "http://localhost:3000")
+URL_FRONTEND = os.getenv("URL_FRONTEND", "http://zmusic.io.vn")
 
 User = get_user_model()
 
